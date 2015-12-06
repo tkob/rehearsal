@@ -1,0 +1,198 @@
+#!/bin/sh
+# vim: set filetype=tcl : \
+exec expect -f "$0" -- ${1+"$@"}
+
+proc shift {var n} {
+    upvar $var list
+    set list [lrange $list $n end]
+}
+
+proc debug {msg} {
+    global debug
+    if {$debug} {
+        puts "# debug: $msg"
+    }
+}
+
+proc print_tap {n result desc directive diag} {
+    if {$directive == ""} {
+        puts "$result $n $desc"
+    } else {
+        puts "$result $n $desc # $directive"
+    }
+    foreach diag_line $diag {
+        puts "# $diag_line"
+    }
+}
+
+proc expect_prompt {} {
+    uplevel 1 {
+        expect -re $prompt {
+        } timeout {
+            expect -re .*
+            error "timeout: prompt /${prompt}/ expected but got <$expect_out(buffer)>"
+        }
+        return $expect_out(buffer)
+    }
+}
+
+proc send_lines {} {
+    uplevel 1 {
+        foreach input_line $input_lines {
+            debug "sending: $input_line"
+            send $input_line
+            send "\r"
+            # eat echo back
+            debug "expect: $input_line"
+            expect -ex "$input_line\r\n" {} timeout {error "no echo back <$input_line>"}
+        }
+    }
+}
+
+proc run_test {} {
+    uplevel 1 {
+        set desc [dict get $test desc]
+        set steps [dict get $test steps]
+        foreach {input output} $steps {
+            set input_lines [split $input "\n"]
+            send_lines
+
+            set state normal
+            set diag [list]
+            while {[llength $output] >= 2} {
+                # peek first two elements, options and line, from output
+                lassign $output opts output_line
+                if {$opts == "snip"} {
+                    set state snip
+                    shift output 2
+                    continue
+                }
+                set line_match false
+                expect \
+                    -re {.*?\r\n} {
+                        set line [string trimright $expect_out(buffer) "\r\n"]
+                        debug "actual_line: <$line>"
+                        debug "expected_line: <$output_line>"
+                        if {$line == $output_line} {
+                            debug "match"
+                            set line_match true
+                            set state normal
+                            # eat first two elements if matched
+                            shift output 2
+                        } else {
+                            debug "unmatch"
+                            if {$state == "snip"} {
+                                exp_continue
+                            } else {
+                                lappend diag "expected: $output_line"
+                                lappend diag "actual: [string trimright $expect_out(buffer) "\r\n"]"
+                                break
+                            }
+                        }
+                    } \
+                    timeout break
+            }
+            if {!$line_match} break
+        }
+        # ensure the prompt is there before moving to the next test
+        set until_prompt [expect_prompt]
+        regexp "^(.*)$prompt\$" $until_prompt match trailing
+        if {$line_match} {
+            if {$trailing != "" && $state != "snip"} {
+                foreach output_line [split [string trimright $trailing "\r\n"]] {
+                    lappend diag "unexpected trailing line: $output_line"
+                }
+                set result "not ok"
+            } else {
+                set result "ok"
+            }
+        } else {
+            # if $line_match is false, the while loop should have exitted with
+            # break because of an unmatched line or timeout.
+            # In the latter case, $diag should be empty
+            if {[llength $diag] == 0} {
+                if {$trailing == $output_line} {
+                    debug "match'"
+                    # eat first two elements if matched
+                    shift output 2
+                    if {[llength $output] > 0} {
+                        lassign $output opts output_line
+                        lappend diag "expected: $output_line"
+                        lappend diag "actual: "
+                        set result "not ok"
+                    } else {
+                        set result "ok"
+                    }
+                } else {
+                    lassign $output opts output_line
+                    lappend diag "expected: $output_line"
+                    lappend diag "actual: $trailing"
+                    set result "not ok"
+                }
+            } else {
+                set result "not ok"
+            }
+        }
+        return [list $result $desc "" $diag]
+    }
+}
+
+proc run_suite {suite} {
+    set command_line [dict get $suite command_line]
+    set prompt [dict get $suite prompt]
+    set tests [dict get $suite tests]
+    set num_tests [llength $tests]
+    if {$num_tests == 0} return
+
+    puts "1..$num_tests"
+    if {[catch {
+            debug "spawning $command_line"
+            spawn {*}$command_line
+            expect_prompt
+
+            set n 0
+            foreach test $tests {
+                incr n
+                debug "running $n"
+                print_tap $n {*}[run_test]
+            }
+
+            send "\004"
+            expect eof
+        } message]} {
+        puts "Bail out!"
+        puts $message
+    }
+}
+
+proc suite {suite} {
+    run_suite $suite
+}
+
+# starting point
+
+# globals
+set debug 0
+set log_file "" 
+
+# parse argv
+while {true} {
+    lassign $argv first
+    if {![string match {-*} $first]} break
+    shift argv 1
+    if {$first == "--"} {
+        break
+    } elseif {$first == "-v"} {
+        set debug 1
+    } elseif {$first == "-log"} {
+        lassign $argv log_file
+        shift argv 1
+    }
+}
+
+log_user 0
+if {$log_file != ""} {
+    log_file -a $log_file
+}
+
+source [lindex $argv 0]
