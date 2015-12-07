@@ -138,6 +138,7 @@ proc run_test {} {
 }
 
 proc run_suite {suite} {
+    global results
     set command_line [dict get $suite command_line]
     set prompt [dict get $suite prompt]
     set tests [dict get $suite tests]
@@ -145,21 +146,32 @@ proc run_suite {suite} {
     if {$num_tests == 0} return
 
     puts "1..$num_tests"
+    set n 0
     if {[catch {
             debug "spawning $command_line"
             spawn {*}$command_line
             expect_prompt
 
-            set n 0
             foreach test $tests {
                 incr n
                 debug "running $n"
-                print_tap $n {*}[run_test]
+                lassign [run_test] result desc directive diag
+                lappend results [dict create \
+                    num $n \
+                    result $result \
+                    desc $desc \
+                    diag $diag]
+                print_tap $n $result $desc $directive $diag
             }
 
             send "\004"
             expect eof
         } message]} {
+        lappend results [dict create \
+            result "Bail out!" \
+            num $n \
+            desc "?" \
+            diag [split $message]]
         puts "Bail out!"
         puts $message
     }
@@ -167,6 +179,38 @@ proc run_suite {suite} {
 
 proc suite {suite} {
     run_suite $suite
+}
+
+proc escape_xml {s} {
+    return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
+}
+
+proc write_junit {} {
+    global results
+    global junit_file
+    set f [open $junit_file w]
+    fconfigure $f -encoding utf-8
+    puts $f {<?xml version="1.0" ?>}
+    puts $f "<testsuite name='rehearsal' tests='[llength $results]'>"
+    foreach result $results {
+        puts $f "<testcase name='[escape_xml "[dict get $result num] [dict get $result desc]"]'>"
+        if {[dict get $result result] == "not ok"} {
+            puts -nonewline $f {<failure>}
+            foreach line [dict get $result diag] {
+                puts $f [escape_xml $line]
+            }
+            puts $f {</failure>}
+        } elseif {[dict get $result result] == "Bail out!"} {
+            puts -nonewline $f {<error>}
+            foreach line [dict get $result diag] {
+                puts $f [escape_xml $line]
+            }
+            puts $f {</error>}
+        }
+        puts $f {</testcase>}
+    }
+    puts $f {</testsuite>}
+    close $f
 }
 
 # starting point
@@ -201,3 +245,7 @@ if {$log_file != ""} {
 }
 
 source [lindex $argv 0]
+
+if {$junit_file != ""} {
+    write_junit
+}
