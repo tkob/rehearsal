@@ -51,9 +51,12 @@ proc send_lines {} {
 
 proc run_test {} {
     uplevel 1 {
+        debug "test: $test"
         set desc [dict get $test desc]
         set steps [dict get $test steps]
         foreach {input output} $steps {
+            debug "input: $input"
+            debug "output: $output"
             set input_lines [split $input "\n"]
             send_lines
 
