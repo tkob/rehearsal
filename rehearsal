@@ -2,6 +2,203 @@
 # vim: set filetype=tcl : \
 exec expect -f "$0" -- ${1+"$@"}
 
+namespace eval markdown {
+
+    # operations for 'test' dicr type
+    proc test_new {} {
+        return [dict create desc "" steps [list] input [list] output [list]]
+    }
+
+    proc test_set_desc {test_var desc} {
+        upvar $test_var test
+        dict set test desc $heading
+    }
+
+    proc test_append_input {test_var line} {
+        upvar $test_var test
+        dict lappend test input $line
+    }
+
+    proc test_append_output {test_var line} {
+        upvar $test_var test
+        dict lappend test output -ex $line
+    }
+
+    proc test_carry_step {test_var} {
+        upvar $test_var test
+
+        if {[llength [dict get $test input]] > 0} {
+            dict lappend test steps \
+                [join [dict get $test input] "\n"] \
+                [dict get $test output]
+            dict set test input [list]
+            dict set test output [list]
+        }
+    }
+
+    proc test_carry {tests_var test_var} {
+        upvar $tests_var tests
+        upvar $test_var test
+
+        if {[llength [dict get $test steps]] > 0} {
+            lappend tests $test
+            dict set test steps [list]
+        }
+    }
+
+    # markdown parser
+
+    proc parse {channel command_line} {
+        global ps1
+
+        set state md_default
+        set prev ""
+        set tests [list]
+        set test [test_new]
+        while {![eof $channel]} {
+            gets $channel line
+            debug "state: $state, line: $line"
+            set state [{*}$state $line]
+            set prev $line
+        }
+        test_carry tests test
+        set suite [dict create command_line $command_line prompt $ps1 tests $tests]
+        debug "suite: $suite"
+        return $suite
+    }
+
+    proc md_default {line} {
+        global ps1
+        upvar tests tests
+        upvar test test
+
+        if {[regexp {^#{1,6}\s*(.*)#{0,6}\s*$} $line match heading]} {
+            test_carry tests test
+            dict set test desc $heading
+            return md_default
+        } elseif {[string match "`````*" $line]} {
+            return [list md_in_fence_ps1 5]
+        } elseif {[string match "````*" $line]} {
+            return [list md_in_fence_ps1 4]
+        } elseif {[string match "```*" $line]} {
+            return [list md_in_fence_ps1 3]
+        } elseif {[regexp {^    (.*)} $line match line]} {
+            if {[regexp "^${ps1}(.*)\$" $line match line]} {
+                test_append_input test $line
+                return md_indent_ps2
+            } else {
+                return md_indent_skip
+            }
+        } else {
+            return md_default
+        }
+    }
+
+    proc md_in_fence_ps1 {num_ticks line} {
+        global ps1
+        upvar tests tests
+        upvar test test
+
+        set ticks [string repeat "`" $num_ticks]
+        if {$line == $ticks} {
+            test_carry_step test
+            return md_default
+        } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
+            test_append_input test $line
+            return [list md_in_fence_ps2 $num_ticks]
+        } else {
+            return [list md_in_fence_skip $num_ticks]
+        }
+    }
+
+    proc md_in_fence_ps2 {num_ticks line} {
+        global ps2
+        upvar tests tests
+        upvar test test
+
+        set ticks [string repeat "`" $num_ticks]
+        if {$line == $ticks} {
+            test_carry_step test
+            return md_default
+        } elseif {[regexp "^${ps2}(.*)\$" $line match line]} {
+            test_append_input test $line
+            return [list md_in_fence_ps2 $num_ticks]
+        } else {
+            test_append_output test $line
+            return [list md_in_fence_output $num_ticks]
+        }
+    }
+
+    proc md_in_fence_output {num_ticks line} {
+        upvar tests tests
+        upvar test test
+
+        set ticks [string repeat "`" $num_ticks]
+        if {$line == $ticks} {
+            test_carry_step test
+            return md_default
+        } else {
+            test_append_output test $line
+            return [list md_in_fence_output $num_ticks]
+        }
+    }
+
+    proc md_in_fence_skip {num_ticks line} {
+        upvar tests tests
+        upvar test test
+
+        set ticks [string repeat "`" $num_ticks]
+        if {$line == $ticks} {
+            return md_default
+        } else {
+            return [list md_in_fence_skip $num_ticks]
+        }
+    }
+
+    proc md_indent_ps2 {line} {
+        global ps2
+        upvar tests tests
+        upvar test test
+
+        if {[regexp {^    (.*)} $line match line]} {
+            if {[regexp "^${ps2}(.*)\$" $line match line]} {
+                test_append_input test $line
+                return md_indent_ps2
+            } else {
+                test_append_output test $line
+                return md_indent_output
+            }
+        } else {
+            test_carry_step test
+            return [md_default $line]
+        }
+    }
+
+    proc md_indent_output {line} {
+        upvar tests tests
+        upvar test test
+
+        if {[regexp {^    (.*)} $line match line]} {
+            test_append_output test $line
+            return md_indent_output
+        } else {
+            test_carry_step test
+            return [md_default $line]
+        }
+    }
+
+    proc md_indent_skip {line} {
+        upvar tests tests
+        upvar test test
+
+        if {[regexp {^    (.*)} $line]} {
+            return md_indent_skip
+        } else {
+            return [md_default $line]
+        }
+    }
+}
+
 proc shift {var n} {
     upvar $var list
     set list [lrange $list $n end]
