@@ -223,6 +223,10 @@ set debug 0
 set log_file "" 
 set junit_file ""
 set results [list]
+set md 0
+set command_line ""
+set ps1 ""
+set ps2 ""
 
 # parse argv
 while {true} {
@@ -239,6 +243,17 @@ while {true} {
     } elseif {$first == "-junit"} {
         lassign $argv junit_file
         shift argv 1
+    } elseif {$first == "-command"} {
+        lassign $argv command_line
+        shift argv 1
+    } elseif {$first == "-ps1"} {
+        lassign $argv ps1
+        shift argv 1
+    } elseif {$first == "-ps2"} {
+        lassign $argv ps2
+        shift argv 1
+    } elseif {$first == "-md"} {
+        set md 1
     }
 }
 
