@@ -421,9 +421,9 @@ set log_file ""
 set junit_file ""
 set results [list]
 set md 0
-set command_line ""
-set ps1 ""
-set ps2 ""
+set command_line {sh}
+set ps1 {\$ }
+set ps2 {> }
 
 # parse argv
 while {true} {
