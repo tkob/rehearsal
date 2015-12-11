@@ -24,6 +24,11 @@ namespace eval markdown {
         dict lappend test output -ex $line
     }
 
+    proc test_append_snip {test_var} {
+        upvar $test_var test
+        dict lappend test output snip {}
+    }
+
     proc test_carry_step {test_var} {
         upvar $test_var test
 
@@ -123,6 +128,9 @@ namespace eval markdown {
         } elseif {[regexp "^${ps2}(.*)\$" $line match line]} {
             test_append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
+        } elseif {$line == "..."} {
+            test_append_snip test
+            return [list md_in_fence_output $num_ticks]
         } else {
             test_append_output test $line
             return [list md_in_fence_output $num_ticks]
@@ -137,6 +145,9 @@ namespace eval markdown {
         if {$line == $ticks} {
             test_carry_step test
             return md_default
+        } elseif {$line == "..."} {
+            test_append_snip test
+            return [list md_in_fence_output $num_ticks]
         } else {
             test_append_output test $line
             return [list md_in_fence_output $num_ticks]
@@ -164,6 +175,9 @@ namespace eval markdown {
             if {[regexp "^${ps2}(.*)\$" $line match line]} {
                 test_append_input test $line
                 return md_indent_ps2
+            } elseif {$line == "    ..."} {
+                test_append_snip test
+                return md_indent_output
             } else {
                 test_append_output test $line
                 return md_indent_output
@@ -181,6 +195,9 @@ namespace eval markdown {
         if {[regexp {^    (.*)} $line match line]} {
             test_append_output test $line
             return md_indent_output
+        } elseif {$line == "    ..."} {
+            test_append_snip test
+            return [md_default $line]
         } else {
             test_carry_step test
             return [md_default $line]
