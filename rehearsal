@@ -451,6 +451,9 @@ while {true} {
         shift argv 1
     } elseif {$first == "-md"} {
         set md 1
+    } elseif {$first == "-timeout"} {
+        lassign $argv timeout; # timeout variable of Expect
+        shift argv 1
     }
 }
 
