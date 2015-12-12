@@ -2,34 +2,34 @@
 # vim: set filetype=tcl : \
 exec expect -f "$0" -- ${1+"$@"}
 
-namespace eval markdown {
+namespace eval testcase {
+    # operations for 'testcase' dict type
 
-    # operations for 'test' dicr type
-    proc test_new {} {
+    proc new {} {
         return [dict create desc "" steps [list] input [list] output [list]]
     }
 
-    proc test_set_desc {test_var desc} {
+    proc set_desc {test_var desc} {
         upvar $test_var test
         dict set test desc $heading
     }
 
-    proc test_append_input {test_var line} {
+    proc append_input {test_var line} {
         upvar $test_var test
         dict lappend test input $line
     }
 
-    proc test_append_output {test_var line} {
+    proc append_output {test_var line} {
         upvar $test_var test
         dict lappend test output -ex $line
     }
 
-    proc test_append_snip {test_var} {
+    proc append_snip {test_var} {
         upvar $test_var test
         dict lappend test output snip {}
     }
 
-    proc test_carry_step {test_var} {
+    proc carry_step {test_var} {
         upvar $test_var test
 
         if {[llength [dict get $test input]] > 0} {
@@ -41,7 +41,7 @@ namespace eval markdown {
         }
     }
 
-    proc test_carry {tests_var test_var} {
+    proc carry {tests_var test_var} {
         upvar $tests_var tests
         upvar $test_var test
 
@@ -50,7 +50,9 @@ namespace eval markdown {
             dict set test steps [list]
         }
     }
+}
 
+namespace eval markdown {
     # markdown parser
 
     proc parse {channel command_line} {
@@ -59,14 +61,14 @@ namespace eval markdown {
         set state md_default
         set prev ""
         set tests [list]
-        set test [test_new]
+        set test [testcase::new]
         while {![eof $channel]} {
             gets $channel line
             debug "state: $state, line: $line"
             set state [{*}$state $line]
             set prev $line
         }
-        test_carry tests test
+        testcase::carry tests test
         set suite [dict create command_line $command_line prompt $ps1 tests $tests]
         debug "suite: $suite"
         return $suite
@@ -78,7 +80,7 @@ namespace eval markdown {
         upvar test test
 
         if {[regexp {^#{1,6}\s*(.*)#{0,6}\s*$} $line match heading]} {
-            test_carry tests test
+            testcase::carry tests test
             dict set test desc $heading
             return md_default
         } elseif {[string match "`````*" $line]} {
@@ -89,7 +91,7 @@ namespace eval markdown {
             return [list md_in_fence_ps1 3]
         } elseif {[regexp {^    (.*)} $line match line]} {
             if {[regexp "^${ps1}(.*)\$" $line match line]} {
-                test_append_input test $line
+                testcase::append_input test $line
                 return md_indent_ps2
             } else {
                 return md_indent_skip
@@ -106,10 +108,10 @@ namespace eval markdown {
 
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
-            test_carry_step test
+            testcase::carry_step test
             return md_default
         } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
-            test_append_input test $line
+            testcase::append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
         } else {
             return [list md_in_fence_skip $num_ticks]
@@ -123,16 +125,16 @@ namespace eval markdown {
 
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
-            test_carry_step test
+            testcase::carry_step test
             return md_default
         } elseif {[regexp "^${ps2}(.*)\$" $line match line]} {
-            test_append_input test $line
+            testcase::append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
         } elseif {$line == "..."} {
-            test_append_snip test
+            testcase::append_snip test
             return [list md_in_fence_output $num_ticks]
         } else {
-            test_append_output test $line
+            testcase::append_output test $line
             return [list md_in_fence_output $num_ticks]
         }
     }
@@ -143,13 +145,13 @@ namespace eval markdown {
 
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
-            test_carry_step test
+            testcase::carry_step test
             return md_default
         } elseif {$line == "..."} {
-            test_append_snip test
+            testcase::append_snip test
             return [list md_in_fence_output $num_ticks]
         } else {
-            test_append_output test $line
+            testcase::append_output test $line
             return [list md_in_fence_output $num_ticks]
         }
     }
@@ -173,17 +175,17 @@ namespace eval markdown {
 
         if {[regexp {^    (.*)} $line match line]} {
             if {[regexp "^${ps2}(.*)\$" $line match line]} {
-                test_append_input test $line
+                testcase::append_input test $line
                 return md_indent_ps2
             } elseif {$line == "    ..."} {
-                test_append_snip test
+                testcase::append_snip test
                 return md_indent_output
             } else {
-                test_append_output test $line
+                testcase::append_output test $line
                 return md_indent_output
             }
         } else {
-            test_carry_step test
+            testcase::carry_step test
             return [md_default $line]
         }
     }
@@ -193,13 +195,13 @@ namespace eval markdown {
         upvar test test
 
         if {[regexp {^    (.*)} $line match line]} {
-            test_append_output test $line
+            testcase::append_output test $line
             return md_indent_output
         } elseif {$line == "    ..."} {
-            test_append_snip test
+            testcase::append_snip test
             return [md_default $line]
         } else {
-            test_carry_step test
+            testcase::carry_step test
             return [md_default $line]
         }
     }
