@@ -317,9 +317,13 @@ proc run_test {} {
         set until_prompt [expect_prompt]
         regexp "^(.*)$prompt\$" $until_prompt match trailing
         if {$line_match} {
-            if {$trailing != "" && $state != "snip"} {
-                foreach output_line [split [string trimright $trailing "\r\n"]] {
-                    lappend diag "unexpected trailing line: $output_line"
+            set trailing_lines [list]
+            foreach output_line [split [string trimright $trailing "\r\n"]] {
+                lappend trailing_lines $output_line
+            }
+            if {[llength $trailing_lines] != 0 && $state != "snip"} {
+                foreach trailing_line $trailing_lines {
+                    lappend diag "unexpected trailing line: $trailing_line"
                 }
                 set result "not ok"
             } else {
