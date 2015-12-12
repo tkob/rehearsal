@@ -1,84 +1,65 @@
-suite {
-    command_line {sh}
-    prompt {\$ }
-    tests {
-        {
-            desc "snip in the middle"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    -ex {abc}
-                    snip {}
-                    -ex {mno}
-                }
-            }
-        }
-        {
-            desc "snip in the beginning"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    snip {}
-                    -ex {mno}
-                }
-            }
-        }
-        {
-            desc "snip in the beginning 2"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    snip {}
-                    -ex {abc}
-                    -ex {def}
-                    -ex {ghi}
-                    -ex {jkl}
-                    -ex {mno}
-                }
-            }
-        }
-        {
-            desc "snip in the end"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    -ex {abc}
-                    snip {}
-                }
-            }
-        }
-        {
-            desc "snip in the end 2"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    -ex {abc}
-                    -ex {def}
-                    -ex {ghi}
-                    -ex {jkl}
-                    -ex {mno}
-                    snip {}
-                }
-            }
-        }
-        {
-            desc "mix"
-            steps {
-                {cat t/t/cat.txt}
-                {
-                    snip {}
-                    -ex {abc}
-                    snip {}
-                    -ex {def}
-                    snip {}
-                    -ex {ghi}
-                    snip {}
-                    -ex {jkl}
-                    snip {}
-                    -ex {mno}
-                    snip {}
-                }
-            }
-        }
-    }
-}
+# snip in the middle
+
+```
+$ cat t/t/cat.txt
+abc
+...
+mno
+```
+
+# snip in the beginning
+
+```
+$ cat t/t/cat.txt
+...
+mno
+```
+
+# snip in the beginning 2
+
+```
+$ cat t/t/cat.txt
+...
+abc
+def
+ghi
+jkl
+mno
+```
+
+# snip in the end
+
+```
+$ cat t/t/cat.txt
+abc
+...
+```
+
+# snip in the end 2
+
+```
+$ cat t/t/cat.txt
+abc
+def
+ghi
+jkl
+mno
+...
+```
+
+# mix
+
+```
+$ cat t/t/cat.txt
+...
+abc
+...
+def
+...
+ghi
+...
+jkl
+...
+mno
+...
+```
