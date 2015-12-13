@@ -34,7 +34,7 @@ namespace eval testcase {
 
         if {[llength [dict get $test input]] > 0} {
             dict lappend test steps \
-                [join [dict get $test input] "\n"] \
+                [dict get $test input] \
                 [dict get $test output]
             dict set test input [list]
             dict set test output [list]
@@ -273,7 +273,7 @@ proc run_test {} {
         foreach {input output} $steps {
             debug "input: $input"
             debug "output: $output"
-            set input_lines [split $input "\n"]
+            set input_lines $input
             send_lines
 
             set state normal
