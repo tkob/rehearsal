@@ -474,6 +474,9 @@ while {true} {
     } elseif {$first == "-timeout"} {
         lassign $argv timeout; # timeout variable of Expect
         shift argv 1
+    } else {
+        puts "unknown option: $first"
+        exit 1
     }
 }
 
