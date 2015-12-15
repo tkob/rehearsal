@@ -254,13 +254,19 @@ proc expect_prompt {} {
 
 proc send_lines {} {
     uplevel 1 {
+        global ps2
+        set cont false
         foreach input_line $input_lines {
+            if {$cont} {
+                expect $ps2
+            }
             debug "sending: $input_line"
             send $input_line
             send "\r"
             # eat echo back
             debug "expect: $input_line"
             expect -ex "$input_line\r\n" {} timeout {error "no echo back <$input_line>"}
+            set cont true
         }
     }
 }
