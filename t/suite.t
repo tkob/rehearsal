@@ -24,10 +24,9 @@ not ok 1 cat output - line not match
 # expected: xxx
 # actual: ghi
 not ok 2 cat output - less line
-# expected: pqr
-# actual: 
+# expected <pqr> but reached end
 not ok 3 cat output - too match line
-# unexpected trailing line: mno
+# expected end but got <mno>
 ```
 
 # no-newline.t
@@ -71,11 +70,9 @@ ok 6 mix
 $ ./rehearsal -timeout 1 t/t/snip-fail.t
 1..3
 not ok 1 snip in the middle - fail
-# expected: xyz
-# actual: 
+# expected <xyz> but reached end
 not ok 2 snip in the beginning - fail
-# expected: xyz
-# actual: 
+# expected <xyz> but reached end
 not ok 3 snip in the end - fail
 # expected: xyz
 # actual: abc

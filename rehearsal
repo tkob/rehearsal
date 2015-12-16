@@ -2,6 +2,8 @@
 # vim: set filetype=tcl : \
 exec expect -f "$0" -- ${1+"$@"}
 
+package require textutil
+
 namespace eval testcase {
     # operations for 'testcase' dict type
 
@@ -248,7 +250,8 @@ proc expect_prompt {} {
             expect -re .*
             error "timeout: prompt /${prompt}/ expected but got <$expect_out(buffer)>"
         }
-        return $expect_out(buffer)
+        regexp "^(.*)$prompt\$" $expect_out(buffer) match before_prompt
+        return $before_prompt
     }
 }
 
@@ -275,94 +278,89 @@ proc run_test {} {
     uplevel 1 {
         debug "test: $test"
         set desc [dict get $test desc]
+        set result "unknown"
+        set diag [list]
         set steps [dict get $test steps]
+        set state normal
+        set actual_output [list]
         foreach {input output} $steps {
             debug "input: $input"
             debug "output: $output"
             set input_lines $input
             send_lines
 
-            set state normal
-            set diag [list]
-            while {[llength $output] >= 2} {
+            set actual_output [expect_prompt]
+            regsub -all {\r} $actual_output "" actual_output
+            set actual_output [textutil::splitx [string trimright $actual_output "\r\n"] {\n}]
+
+            if {[llength $output] > 0} {
                 # peek first two elements, options and line, from output
                 lassign $output opts output_line
+                shift output 2
                 if {$opts == "snip"} {
                     set state snip
+                    lassign $output opts output_line
+                    debug "until: $output_line"
                     shift output 2
-                    continue
+                } else {
+                    set state normal
                 }
-                set line_match false
-                expect \
-                    -re {.*?\r\n} {
-                        set line [string trimright $expect_out(buffer) "\r\n"]
-                        debug "actual_line: <$line>"
-                        debug "expected_line: <$output_line>"
-                        if {$line == $output_line} {
-                            debug "match"
-                            set line_match true
-                            set state normal
-                            # eat first two elements if matched
-                            shift output 2
-                        } else {
-                            debug "unmatch"
-                            if {$state == "snip"} {
-                                exp_continue
-                            } else {
-                                lappend diag "expected: $output_line"
-                                lappend diag "actual: [string trimright $expect_out(buffer) "\r\n"]"
-                                break
-                            }
-                        }
-                    } \
-                    timeout break
-            }
-            if {!$line_match} break
-        }
-        # ensure the prompt is there before moving to the next test
-        set until_prompt [expect_prompt]
-        regexp "^(.*)$prompt\$" $until_prompt match trailing
-        if {$line_match} {
-            set trailing_lines [list]
-            foreach output_line [split [string trimright $trailing "\r\n"]] {
-                lappend trailing_lines $output_line
-            }
-            if {[llength $trailing_lines] != 0 && $state != "snip"} {
-                foreach trailing_line $trailing_lines {
-                    lappend diag "unexpected trailing line: $trailing_line"
-                }
-                set result "not ok"
             } else {
-                set result "ok"
+                set state end
             }
-        } else {
-            # if $line_match is false, the while loop should have exitted with
-            # break because of an unmatched line or timeout.
-            # In the latter case, $diag should be empty
-            if {[llength $diag] == 0} {
-                if {$trailing == $output_line} {
-                    debug "match'"
-                    # eat first two elements if matched
-                    shift output 2
-                    if {[llength $output] > 0} {
-                        lassign $output opts output_line
-                        lappend diag "expected: $output_line"
-                        lappend diag "actual: "
-                        set result "not ok"
+            foreach line $actual_output {
+                debug "state: $state"
+                if {$state == "end"} {
+                    lappend diag "expected end but got <$line>"
+                    return [list "not ok" $desc "" $diag]
+                }
+                if {$state == "normal"} {
+                    debug "actual_line: <$line>"
+                    debug "expected_line: <$output_line>"
+                    if {$line == $output_line} {
+                        debug "match"
                     } else {
-                        set result "ok"
+                        debug "unmatch"
+                        if {$state != "snip"} {
+                            lappend diag "expected: $output_line"
+                            lappend diag "actual: $line"
+                            return [list "not ok" $desc "" $diag]
+                        }
+                    }
+                } elseif {$state == "snip"} {
+                    debug "actual_line: <$line>"
+                    debug "expected_line: <$output_line>"
+                    if {$line == $output_line} {
+                        debug "match"
+                    } else {
+                        debug "unmatch (snip)"
+                        continue
+                    }
+                }
+                # next state
+                if {[llength $output] > 0} {
+                    # peek first two elements, options and line, from output
+                    lassign $output opts output_line
+                    shift output 2
+                    if {$opts == "snip"} {
+                        set state snip
+                        lassign $output opts output_line
+                        debug "until: $output_line"
+                        shift output 2
+                    } else {
+                        set state normal
                     }
                 } else {
-                    lassign $output opts output_line
-                    lappend diag "expected: $output_line"
-                    lappend diag "actual: $trailing"
-                    set result "not ok"
+                    set state end
                 }
-            } else {
-                set result "not ok"
+            }
+            debug "end state: $state, <$output_line>"
+            if {$state != "end" && $output_line != ""} {
+                lappend diag "expected <$output_line> but reached end"
+                return [list "not ok" $desc "" $diag]
             }
         }
-        return [list $result $desc "" $diag]
+        return [list "ok" $desc "" $diag]
     }
 }
 
