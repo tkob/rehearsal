@@ -354,7 +354,7 @@ proc run_test {} {
                     set state end
                 }
             }
-            debug "end state: $state, <$output_line>"
+            debug "end state: $state"
             if {$state != "end" && $output_line != ""} {
                 lappend diag "expected <$output_line> but reached end"
                 return [list "not ok" $desc "" $diag]
