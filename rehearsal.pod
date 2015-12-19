@@ -1,0 +1,48 @@
+=head1 NAME
+
+rehearsal - A testing framework based on interactive shell
+
+=head1 SYNOPSIS
+
+rehearsal ?-log I<file>? ?-junit I<file>? ?-command I<command>? ?-ps1 I<regexp>? ?-ps2 I<regexp>? ?-timeout I<seconds>? ?--? I<file>
+
+=head1 DESCRIPTION
+
+B<rehearsal> is a light-weight testing framework based on interactive shell (or 'REPL').
+You only need to copy-and-paste a session from REPL to a Markdown document and you will get an automated test suite.
+
+=head1 OPTIONS
+
+=over 13
+
+=item -log I<file>
+
+A file to which dialogue is logged.
+
+=item -junit I<file>
+
+Write JUnit XML file.
+
+=item -command I<command>
+
+Specify the command line that initiates an interactive session, e.g. 'python' for Python interactive shell.
+
+=item -ps1 I<regexp>
+
+Prompt of the interactive shell in regular expression, e.g. '>>> ' for python (note the trailing space).
+
+=item -ps2 I<regexp>
+
+Multi-line continuation prompt in regular expression, e.g. '\.\.\. ' for python (note the escaping).
+
+=item -timeout I<seconds>
+
+Timeout value in seconds for which B<rehearsal> will wait response from the interactive shell.
+
+=item --
+
+Do not interpret any more arguments as options.
+
+=back
+
+=cut

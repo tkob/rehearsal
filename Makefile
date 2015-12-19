@@ -1,5 +1,15 @@
+VERSION = 0.1.0
+
 check:
 	prove -v --exec ./rehearsal
+
+man: man/rehearsal.n
+
+man/rehearsal.n: rehearsal.pod
+	pod2man -n rehearsal -r Rehearsal -d $(VERSION) -c "" rehearsal.pod > man/rehearsal.n
+
+clean:
+	rm -rf man/rehearsal.n
 
 python:
 	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
@@ -24,3 +34,4 @@ scala:
 
 lua:
 	./rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
+
