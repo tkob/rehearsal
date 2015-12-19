@@ -261,7 +261,7 @@ proc send_lines {} {
         set cont false
         foreach input_line $input_lines {
             if {$cont} {
-                expect $ps2
+                expect $ps2 {} timeout {error "no ps2"}
             }
             debug "sending: $input_line"
             send $input_line
