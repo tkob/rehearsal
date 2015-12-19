@@ -34,4 +34,3 @@ scala:
 
 lua:
 	./rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
-
