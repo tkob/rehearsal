@@ -26,18 +26,22 @@ Write JUnit XML file.
 =item -command I<command>
 
 Specify the command line that initiates an interactive session, e.g. 'python' for Python interactive shell.
+The default value is C<'sh'>.
 
 =item -ps1 I<regexp>
 
-Prompt of the interactive shell in regular expression, e.g. '>>> ' for python (note the trailing space).
+Prompt of the interactive shell in regular expression, e.g. C<'E<gt>E<gt>E<gt> '> for python (note the trailing space).
+The default value is C<'\$ '>.
 
 =item -ps2 I<regexp>
 
-Multi-line continuation prompt in regular expression, e.g. '\.\.\. ' for python (note the escaping).
+Multi-line continuation prompt in regular expression, e.g. C<'\.\.\. '> for python (note the escaping).
+The default value is C<'E<gt> '>.
 
 =item -timeout I<seconds>
 
 Timeout value in seconds for which B<rehearsal> will wait response from the interactive shell.
+The default value is 10.
 
 =item --
 
