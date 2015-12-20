@@ -11,6 +11,8 @@ man/rehearsal.n: rehearsal.pod
 clean:
 	rm -rf man/rehearsal.n
 
+extra-check: python sml poly smlsharp alice ocaml scala lua
+
 python:
 	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
 
