@@ -21,7 +21,7 @@ poly:
 	./rehearsal -command poly -ps1 '> ' -ps2 '# ' t/t/poly.t
 
 smlsharp:
-	./rehearsal -command poly -ps1 '# ' -ps2 '> ' t/t/smlsharp.t
+	./rehearsal -command smlsharp -ps1 '# ' -ps2 '> ' t/t/smlsharp.t
 
 alice:
 	./rehearsal -command alice -ps1 '- ' -ps2 '  ' t/t/alice.t
