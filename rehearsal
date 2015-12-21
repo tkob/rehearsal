@@ -121,6 +121,7 @@ namespace eval markdown {
     }
 
     proc md_in_fence_ps2 {num_ticks line} {
+        global ps1
         global ps2
         upvar tests tests
         upvar test test
@@ -130,6 +131,10 @@ namespace eval markdown {
             testcase::carry_step test
             return md_default
         } elseif {[regexp "^${ps2}(.*)\$" $line match line]} {
+            testcase::append_input test $line
+            return [list md_in_fence_ps2 $num_ticks]
+        } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
+            testcase::carry_step test
             testcase::append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
         } elseif {$line == "..."} {
@@ -142,6 +147,7 @@ namespace eval markdown {
     }
 
     proc md_in_fence_output {num_ticks line} {
+        global ps1
         upvar tests tests
         upvar test test
 
@@ -149,6 +155,10 @@ namespace eval markdown {
         if {$line == $ticks} {
             testcase::carry_step test
             return md_default
+        } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
+            testcase::carry_step test
+            testcase::append_input test $line
+            return [list md_in_fence_ps2 $num_ticks]
         } elseif {$line == "..."} {
             testcase::append_snip test
             return [list md_in_fence_output $num_ticks]

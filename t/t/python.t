@@ -15,3 +15,14 @@ Call it.
 hello!
 ```
 
+Define and call twice.
+
+```
+>>> def greet2():
+...     print "hello!"
+... 
+>>> greet2()
+hello!
+>>> greet2()
+hello!
+```
