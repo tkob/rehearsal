@@ -265,6 +265,17 @@ proc expect_prompt {} {
     }
 }
 
+proc expect_banner {} {
+    uplevel 1 {
+        global banner
+        expect -re $banner {
+        } timeout {
+            expect -re .*
+            error "timeout: banner /${banner}/ expected but got <$expect_out(buffer)>"
+        }
+    }
+}
+
 proc send_lines {} {
     uplevel 1 {
         global ps2
@@ -387,6 +398,7 @@ proc run_suite {suite} {
     if {[catch {
             debug "spawning $command_line"
             spawn {*}$command_line
+            expect_banner
             expect_prompt
 
             foreach test $tests {
@@ -460,6 +472,7 @@ set results [list]
 set command_line {sh}
 set ps1 {\$ }
 set ps2 {> }
+set banner ""
 
 # parse argv
 while {true} {
@@ -478,6 +491,9 @@ while {true} {
         shift argv 1
     } elseif {$first == "-command"} {
         lassign $argv command_line
+        shift argv 1
+    } elseif {$first == "-banner"} {
+        lassign $argv banner
         shift argv 1
     } elseif {$first == "-ps1"} {
         lassign $argv ps1
