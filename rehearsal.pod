@@ -4,7 +4,7 @@ rehearsal - A testing framework based on interactive shell
 
 =head1 SYNOPSIS
 
-rehearsal ?-log I<file>? ?-junit I<file>? ?-command I<command>? ?-banner I<regexp>? ?-ps1 I<regexp>? ?-ps2 I<regexp>? ?-timeout I<seconds>? ?--? I<file>
+rehearsal ?-log I<file>? ?-junit I<file>? ?-command I<command>? ?-banner I<regexp>? ?-ps1 I<regexp>? ?-ps2 I<regexp>? ?-snip I<string>? ?-timeout I<seconds>? ?--? I<file>
 
 =head1 DESCRIPTION
 
@@ -41,6 +41,10 @@ The default value is C<'\$ '>.
 
 Multi-line continuation prompt in regular expression, e.g. C<'\.\.\. '> for python (note the escaping).
 The default value is C<'E<gt> '>.
+
+=item -snip I<line>
+
+If this string appears in the source, the line is interpreted as non-greedy wildcard.
 
 =item -timeout I<seconds>
 

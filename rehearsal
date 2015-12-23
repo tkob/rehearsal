@@ -123,6 +123,7 @@ namespace eval markdown {
     proc md_in_fence_ps2 {num_ticks line} {
         global ps1
         global ps2
+        global snip
         upvar tests tests
         upvar test test
 
@@ -137,7 +138,7 @@ namespace eval markdown {
             testcase::carry_step test
             testcase::append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
-        } elseif {$line == "..."} {
+        } elseif {$line == $snip} {
             testcase::append_snip test
             return [list md_in_fence_output $num_ticks]
         } else {
@@ -148,6 +149,7 @@ namespace eval markdown {
 
     proc md_in_fence_output {num_ticks line} {
         global ps1
+        global snip
         upvar tests tests
         upvar test test
 
@@ -159,7 +161,7 @@ namespace eval markdown {
             testcase::carry_step test
             testcase::append_input test $line
             return [list md_in_fence_ps2 $num_ticks]
-        } elseif {$line == "..."} {
+        } elseif {$line == $snip} {
             testcase::append_snip test
             return [list md_in_fence_output $num_ticks]
         } else {
@@ -183,6 +185,7 @@ namespace eval markdown {
     proc md_indent_ps2 {line} {
         global ps1
         global ps2
+        global snip
         upvar tests tests
         upvar test test
 
@@ -194,7 +197,7 @@ namespace eval markdown {
                 testcase::carry_step test
                 testcase::append_input test $line
                 return md_indent_ps2
-            } elseif {$line == "    ..."} {
+            } elseif {$line == $snip} {
                 testcase::append_snip test
                 return md_indent_output
             } else {
@@ -209,6 +212,7 @@ namespace eval markdown {
 
     proc md_indent_output {line} {
         global ps1
+        global snip
         upvar tests tests
         upvar test test
 
@@ -217,7 +221,7 @@ namespace eval markdown {
                 testcase::carry_step test
                 testcase::append_input test $line
                 return md_indent_ps2
-            } elseif {$line == "    ..."} {
+            } elseif {$line == $snip} {
                 testcase::append_snip test
                 return [md_default $line]
             } else {
@@ -486,6 +490,7 @@ set command_line {sh}
 set ps1 {\$ }
 set ps2 {> }
 set banner ""
+set snip "..."
 
 # parse argv
 while {true} {
@@ -513,6 +518,9 @@ while {true} {
         shift argv 1
     } elseif {$first == "-ps2"} {
         lassign $argv ps2
+        shift argv 1
+    } elseif {$first == "-snip"} {
+        lassign $argv snip
         shift argv 1
     } elseif {$first == "-timeout"} {
         lassign $argv timeout; # timeout variable of Expect
