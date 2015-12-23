@@ -15,6 +15,7 @@ extra-check: python sml poly smlsharp alice ocaml scala lua
 
 python:
 	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
+	./rehearsal -command python2.7 -ps1 ">>> " -ps2 '\.\.\. ' -snip '  ...' t/t/python-intro.t
 
 sml:
 	./rehearsal -command sml -ps1 '- ' -ps2 '= ' t/t/sml.t
