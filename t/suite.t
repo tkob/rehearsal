@@ -77,3 +77,11 @@ not ok 3 snip in the end - fail
 # expected: xyz
 # actual: abc
 ```
+
+# multiplesteps.t
+
+```
+$ ./rehearsal t/t/multisteps.t
+1..1
+ok 1 multiple steps
+```

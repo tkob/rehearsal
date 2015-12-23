@@ -34,3 +34,15 @@ ghi
 jkl
 mno
 ```
+
+Two successive PS1s.
+
+```
+$ printf ""
+$ cat t/t/cat.txt
+abc
+def
+ghi
+jkl
+mno
+```
