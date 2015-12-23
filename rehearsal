@@ -2,8 +2,6 @@
 # vim: set filetype=tcl : \
 exec expect -f "$0" -- ${1+"$@"}
 
-package require textutil
-
 namespace eval testcase {
     # operations for 'testcase' dict type
 
@@ -329,7 +327,7 @@ proc run_test {} {
 
             set actual_output [expect_prompt]
             regsub -all {\r} $actual_output "" actual_output
-            set actual_output [textutil::splitx [string trimright $actual_output "\r\n"] {\n}]
+            set actual_output [split [string trimright $actual_output "\r\n"] "\n"]
 
             if {[llength $output] > 0} {
                 # peek first two elements, options and line, from output
