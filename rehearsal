@@ -181,12 +181,17 @@ namespace eval markdown {
     }
 
     proc md_indent_ps2 {line} {
+        global ps1
         global ps2
         upvar tests tests
         upvar test test
 
         if {[regexp {^    (.*)} $line match line]} {
             if {[regexp "^${ps2}(.*)\$" $line match line]} {
+                testcase::append_input test $line
+                return md_indent_ps2
+            } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
+                testcase::carry_step test
                 testcase::append_input test $line
                 return md_indent_ps2
             } elseif {$line == "    ..."} {
@@ -203,15 +208,22 @@ namespace eval markdown {
     }
 
     proc md_indent_output {line} {
+        global ps1
         upvar tests tests
         upvar test test
 
         if {[regexp {^    (.*)} $line match line]} {
-            testcase::append_output test $line
-            return md_indent_output
-        } elseif {$line == "    ..."} {
-            testcase::append_snip test
-            return [md_default $line]
+            if {[regexp "^${ps1}(.*)\$" $line match line]} {
+                testcase::carry_step test
+                testcase::append_input test $line
+                return md_indent_ps2
+            } elseif {$line == "    ..."} {
+                testcase::append_snip test
+                return [md_default $line]
+            } else {
+                testcase::append_output test $line
+                return md_indent_output
+            }
         } else {
             testcase::carry_step test
             return [md_default $line]
