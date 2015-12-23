@@ -45,6 +45,7 @@ The default value is C<'E<gt> '>.
 =item -snip I<line>
 
 If this string appears in the source, the line is interpreted as non-greedy wildcard.
+The default value is C<'...'>.
 
 =item -timeout I<seconds>
 
