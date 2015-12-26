@@ -18,7 +18,7 @@ ok 1 cat output
 # cat-fail.t
 
 ```
-$ ./rehearsal -timeout 1 t/t/cat-fail.t
+$ ./rehearsal t/t/cat-fail.t
 1..3
 not ok 1 cat output - line not match
 # expected: xxx
@@ -32,7 +32,7 @@ not ok 3 cat output - too match line
 # no-newline.t
 
 ```
-$ ./rehearsal -timeout 1 t/t/no-newline.t
+$ ./rehearsal t/t/no-newline.t
 1..2
 ok 1 no newline 1
 ok 2 no newline 2
@@ -41,7 +41,7 @@ ok 2 no newline 2
 # no-newline-fail.t
 
 ```
-$ ./rehearsal -timeout 1 t/t/no-newline-fail.t
+$ ./rehearsal t/t/no-newline-fail.t
 1..2
 not ok 1 no newline 1
 # expected: hello world
@@ -67,7 +67,7 @@ ok 6 mix
 # snip-fail.t
 
 ```
-$ ./rehearsal -timeout 1 t/t/snip-fail.t
+$ ./rehearsal t/t/snip-fail.t
 1..3
 not ok 1 snip in the middle - fail
 # expected <xyz> but reached end
