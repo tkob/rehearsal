@@ -11,7 +11,7 @@ man/rehearsal.n: rehearsal.pod
 clean:
 	rm -rf man/rehearsal.n
 
-extra-check: python sml poly smlsharp alice ocaml scala lua
+extra-check: python sml poly smlsharp alice ocaml scala lua ruby
 
 python:
 	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
@@ -37,3 +37,6 @@ scala:
 
 lua:
 	./rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
+
+ruby:
+	./rehearsal -command irb -ps1 'irb\(main\):\d+:\d+> ' t/t/ruby-quickstart.t
