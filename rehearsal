@@ -484,7 +484,7 @@ set debug 0
 set log_file "" 
 set junit_file ""
 set results [list]
-set command_line {sh}
+set command_line {ksh}
 set ps1 {\$ }
 set ps2 {> }
 set banner ""

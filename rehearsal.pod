@@ -26,7 +26,7 @@ Write JUnit XML file.
 =item -command I<command>
 
 Specify the command line that initiates an interactive session, e.g. 'python' for Python interactive shell.
-The default value is C<'sh'>.
+The default value is C<'ksh'>.
 
 =item -banner I<regexp>
 
