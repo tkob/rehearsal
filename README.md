@@ -20,17 +20,15 @@ These 'tests', however, disappear if you exit the REPL session.
 
 With rehearsal, you can repeat such tests just creating a file like this (by copy-and-paste from REPL):
 
-````
-# Define and test greet function
-
-```
->>> def greet():
-...     print "hello!"
-... 
->>> greet()
-hello!
-```
-````
+    # Define and test greet function
+    
+    ```
+    >>> def greet():
+    ...     print "hello!"
+    ... 
+    >>> greet()
+    hello!
+    ```
 
 Note: the trailing space after '...' should be preserved.
 
