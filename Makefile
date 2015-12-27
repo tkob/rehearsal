@@ -33,7 +33,7 @@ ocaml:
 	./rehearsal -command ocaml -ps1 '# ' -ps2 '  ' t/t/ocaml.t
 
 scala:
-	./rehearsal -command scala -ps1 'scala> ' -ps2 '     \| ' t/t/scala.t
+	./rehearsal -command 'scala -Xnojline' -ps1 'scala> ' -ps2 '     \| ' t/t/scala.t
 
 lua:
 	./rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
