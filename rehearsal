@@ -302,9 +302,8 @@ proc send_lines {} {
             debug "sending: $input_line"
             send $input_line
             send "\r"
-            # eat echo back
-            debug "expect: $input_line"
-            expect -ex "$input_line\r\n" {} timeout {error "no echo back <$input_line>"}
+            # expect no echo back from tty, send to the log instead
+            send_log "$input_line\r\n"
             set cont true
         }
     }
@@ -412,6 +411,7 @@ proc run_suite {suite} {
     set n 0
     if {[catch {
             debug "spawning $command_line"
+            set stty_init -echo
             spawn {*}$command_line
             expect_banner
             expect_prompt
