@@ -40,6 +40,30 @@ $ rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/greet.t
 ok 1 Define and test greet function
 ```
 
+## Installation
+
+Installation is just adding to your PATH the directory where `rehearsal` is placed.
+Rehearsal depends on Expect based on Tcl8.5+.
+
 ## Command Line Options
 
 See [man page](https://github.com/tkob/rehearsal/blob/master/rehearsal.pod).
+
+## Tested Platforms
+
+| Test     | Ubuntu | AIX 7.1  | Solaris 11.2 |
+| -------- | ------ | -------- | ------------ |
+| ksh      | Yes    | Yes      | Yes          |
+| python   | Yes    | Yes [^1] | Yes          |
+| ruby     | Yes    |          | Yes          |
+| lua      | Yes    |          | Yes          |
+| scala    | Yes    |          |              |
+| ocaml    | Yes    |          |              |
+| sml      | Yes    |          |              |
+| poly     | Yes    |          |              |
+| smlsharp | Yes    |          |              |
+| alice    | Yes    |          |              |
+
+Blank cells mean 'not tested (unknown)'.
+
+[^1] `make python` does not work out of the box because of encoding problem. Except for that, it works.
