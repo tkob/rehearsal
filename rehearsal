@@ -449,9 +449,7 @@ proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
 
-proc write_junit {} {
-    global results
-    global junit_file
+proc write_junit {results junit_file} {
     set f [open $junit_file w]
     fconfigure $f -encoding utf-8
     puts $f {<?xml version="1.0" ?>}
@@ -540,5 +538,5 @@ close $f
 run_suite $suite
 
 if {$junit_file != ""} {
-    write_junit
+    write_junit $results $junit_file
 }
