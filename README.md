@@ -58,11 +58,12 @@ See [man page](https://github.com/tkob/rehearsal/blob/master/rehearsal.pod).
 | ruby     | Yes    |          | Yes          |
 | lua      | Yes    |          | Yes          |
 | scala    | Yes    |          |              |
-| ocaml    | Yes    |          |              |
+| ocaml    | Yes    |          | Yes          |
 | sml      | Yes    |          |              |
 | poly     | Yes    |          |              |
 | smlsharp | Yes    |          |              |
 | alice    | Yes    |          |              |
+| mosml    | Yes    |          |              |
 
 Blank cells mean 'not tested (unknown)'.
 
