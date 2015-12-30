@@ -11,7 +11,7 @@ man/rehearsal.n: rehearsal.pod
 clean:
 	rm -rf man/rehearsal.n
 
-extra-check: python sml poly smlsharp alice ocaml scala lua ruby
+extra-check: python sml poly smlsharp alice mosml ocaml scala lua ruby
 
 python:
 	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
@@ -28,6 +28,9 @@ smlsharp:
 
 alice:
 	./rehearsal -command alice -ps1 '- ' -ps2 '  ' t/t/alice.t
+
+mosml:
+	./rehearsal -command mosml -ps1 '- ' -ps2 '' t/t/mosml.t
 
 ocaml:
 	./rehearsal -command ocaml -ps1 '# ' -ps2 '  ' t/t/ocaml.t
