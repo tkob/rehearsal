@@ -55,10 +55,8 @@ namespace eval testcase {
 namespace eval markdown {
     # markdown parser
 
-    proc parse {channel command_line} {
-        global ps1
-
-        set state md_default
+    proc parse {channel command_line ps1 ps2} {
+        set state [list md_default $ps1 $ps2]
         set prev ""
         set tests [list]
         set test [testcase::new]
@@ -74,53 +72,49 @@ namespace eval markdown {
         return $suite
     }
 
-    proc md_default {line} {
-        global ps1
+    proc md_default {ps1 ps2 line} {
         upvar tests tests
         upvar test test
 
         if {[regexp {^#{1,6}\s*(.*)#{0,6}\s*$} $line match heading]} {
             testcase::carry tests test
             dict set test desc $heading
-            return md_default
+            return [list md_default $ps1 $ps2]
         } elseif {[string match "`````*" $line]} {
-            return [list md_in_fence_ps1 5]
+            return [list md_in_fence_ps1 5 $ps1 $ps2]
         } elseif {[string match "````*" $line]} {
-            return [list md_in_fence_ps1 4]
+            return [list md_in_fence_ps1 4 $ps1 $ps2]
         } elseif {[string match "```*" $line]} {
-            return [list md_in_fence_ps1 3]
+            return [list md_in_fence_ps1 3 $ps1 $ps2]
         } elseif {[regexp {^    (.*)} $line match line]} {
             if {[regexp "^${ps1}(.*)\$" $line match line]} {
                 testcase::append_input test $line
-                return md_indent_ps2
+                return [list md_indent_ps2 $ps1 $ps2]
             } else {
-                return md_indent_skip
+                return [list md_indent_skip $ps1 $ps2]
             }
         } else {
-            return md_default
+            return [list md_default $ps1 $ps2]
         }
     }
 
-    proc md_in_fence_ps1 {num_ticks line} {
-        global ps1
+    proc md_in_fence_ps1 {num_ticks ps1 ps2 line} {
         upvar tests tests
         upvar test test
 
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
             testcase::carry_step test
-            return md_default
+            return [list md_default $ps1 $ps2]
         } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
             testcase::append_input test $line
-            return [list md_in_fence_ps2 $num_ticks]
+            return [list md_in_fence_ps2 $num_ticks $ps1 $ps2]
         } else {
-            return [list md_in_fence_skip $num_ticks]
+            return [list md_in_fence_skip $num_ticks $ps1 $ps2]
         }
     }
 
-    proc md_in_fence_ps2 {num_ticks line} {
-        global ps1
-        global ps2
+    proc md_in_fence_ps2 {num_ticks ps1 ps2 line} {
         global snip
         upvar tests tests
         upvar test test
@@ -128,25 +122,24 @@ namespace eval markdown {
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
             testcase::carry_step test
-            return md_default
+            return [list md_default $ps1 $ps2]
         } elseif {[regexp "^${ps2}(.*)\$" $line match line]} {
             testcase::append_input test $line
-            return [list md_in_fence_ps2 $num_ticks]
+            return [list md_in_fence_ps2 $num_ticks $ps1 $ps2]
         } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
             testcase::carry_step test
             testcase::append_input test $line
-            return [list md_in_fence_ps2 $num_ticks]
+            return [list md_in_fence_ps2 $num_ticks $ps1 $ps2]
         } elseif {$line == $snip} {
             testcase::append_snip test
-            return [list md_in_fence_output $num_ticks]
+            return [list md_in_fence_output $num_ticks $ps1 $ps2]
         } else {
             testcase::append_output test $line
-            return [list md_in_fence_output $num_ticks]
+            return [list md_in_fence_output $num_ticks $ps1 $ps2]
         }
     }
 
-    proc md_in_fence_output {num_ticks line} {
-        global ps1
+    proc md_in_fence_output {num_ticks ps1 ps2 line} {
         global snip
         upvar tests tests
         upvar test test
@@ -154,35 +147,33 @@ namespace eval markdown {
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
             testcase::carry_step test
-            return md_default
+            return [list md_default $ps1 $ps2]
         } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
             testcase::carry_step test
             testcase::append_input test $line
-            return [list md_in_fence_ps2 $num_ticks]
+            return [list md_in_fence_ps2 $num_ticks $ps1 $ps2]
         } elseif {$line == $snip} {
             testcase::append_snip test
-            return [list md_in_fence_output $num_ticks]
+            return [list md_in_fence_output $num_ticks $ps1 $ps2]
         } else {
             testcase::append_output test $line
-            return [list md_in_fence_output $num_ticks]
+            return [list md_in_fence_output $num_ticks $ps1 $ps2]
         }
     }
 
-    proc md_in_fence_skip {num_ticks line} {
+    proc md_in_fence_skip {num_ticks ps1 ps2 line} {
         upvar tests tests
         upvar test test
 
         set ticks [string repeat "`" $num_ticks]
         if {$line == $ticks} {
-            return md_default
+            return [list md_default $ps1 $ps2]
         } else {
-            return [list md_in_fence_skip $num_ticks]
+            return [list md_in_fence_skip $num_ticks $ps1 $ps2]
         }
     }
 
-    proc md_indent_ps2 {line} {
-        global ps1
-        global ps2
+    proc md_indent_ps2 {ps1 ps2 line} {
         global snip
         upvar tests tests
         upvar test test
@@ -190,26 +181,25 @@ namespace eval markdown {
         if {[regexp {^    (.*)} $line match line]} {
             if {[regexp "^${ps2}(.*)\$" $line match line]} {
                 testcase::append_input test $line
-                return md_indent_ps2
+                return [list md_indent_ps2 $ps1 $ps2]
             } elseif {[regexp "^${ps1}(.*)\$" $line match line]} {
                 testcase::carry_step test
                 testcase::append_input test $line
-                return md_indent_ps2
+                return [list md_indent_ps2 $ps1 $ps2]
             } elseif {$line == $snip} {
                 testcase::append_snip test
-                return md_indent_output
+                return [list md_indent_output $ps1 $ps2]
             } else {
                 testcase::append_output test $line
-                return md_indent_output
+                return [list md_indent_output $ps1 $ps2]
             }
         } else {
             testcase::carry_step test
-            return [md_default $line]
+            return [md_default $ps1 $ps2 $line]
         }
     }
 
-    proc md_indent_output {line} {
-        global ps1
+    proc md_indent_output {ps1 ps2 line} {
         global snip
         upvar tests tests
         upvar test test
@@ -218,28 +208,28 @@ namespace eval markdown {
             if {[regexp "^${ps1}(.*)\$" $line match line]} {
                 testcase::carry_step test
                 testcase::append_input test $line
-                return md_indent_ps2
+                return [list md_indent_ps2 $ps1 $ps2]
             } elseif {$line == $snip} {
                 testcase::append_snip test
-                return [md_default $line]
+                return [md_default $ps1 $ps2 $line]
             } else {
                 testcase::append_output test $line
-                return md_indent_output
+                return [list md_indent_output $ps1 $ps2]
             }
         } else {
             testcase::carry_step test
-            return [md_default $line]
+            return [md_default $ps1 $ps2 $line]
         }
     }
 
-    proc md_indent_skip {line} {
+    proc md_indent_skip {ps1 ps2 line} {
         upvar tests tests
         upvar test test
 
         if {[regexp {^    (.*)} $line]} {
-            return md_indent_skip
+            return [list md_indent_skip $ps1 $ps2]
         } else {
-            return [md_default $line]
+            return [md_default $ps1 $ps2 $line]
         }
     }
 }
@@ -533,7 +523,7 @@ if {$log_file != ""} {
 }
 
 set f [open [lindex $argv 0]]
-set suite [markdown::parse $f $command_line]
+set suite [markdown::parse $f $command_line $ps1 $ps2]
 close $f
 run_suite $suite
 
