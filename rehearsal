@@ -523,7 +523,11 @@ if {$log_file != ""} {
 }
 
 set f [open [lindex $argv 0]]
-set suite [markdown::parse $f $command_line $ps1 $ps2]
+if {$ps2 == ""} {
+    set suite [markdown::parse $f $command_line $ps1 $ps1]
+} else {
+    set suite [markdown::parse $f $command_line $ps1 $ps2]
+}
 close $f
 run_suite $suite
 
