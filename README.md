@@ -58,7 +58,7 @@ See [man page](https://github.com/tkob/rehearsal/blob/master/rehearsal.pod).
 | ruby     | Yes    |          | Yes          |
 | lua      | Yes    |          | Yes          |
 | scala    | Yes    |          |              |
-| ocaml    | Yes    |          | Yes          |
+| ocaml    | Yes    | Yes      | Yes          |
 | sml      | Yes    |          |              |
 | poly     | Yes    |          |              |
 | smlsharp | Yes    |          |              |
