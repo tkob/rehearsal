@@ -534,3 +534,12 @@ run_suite $suite
 if {$junit_file != ""} {
     write_junit $results $junit_file
 }
+
+set exit_status 0
+foreach result $results {
+    set case_result [dict get $result result]
+    if {$case_result != "ok"} {
+        set exit_status 1
+    }
+}
+exit $exit_status
