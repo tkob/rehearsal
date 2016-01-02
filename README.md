@@ -60,7 +60,7 @@ See [man page](https://github.com/tkob/rehearsal/blob/master/rehearsal.pod).
 | scala    | Yes    |          |              |
 | ocaml    | Yes    | Yes      | Yes          |
 | sml      | Yes    |          |              |
-| poly     | Yes    |          |              |
+| poly     | Yes    |          | Yes          |
 | smlsharp | Yes    |          |              |
 | alice    | Yes    |          |              |
 | mosml    | Yes    |          |              |
