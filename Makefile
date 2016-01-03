@@ -1,3 +1,7 @@
+PREFIX = /usr
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/share/man
+
 VERSION = 0.1
 MAINTAINER_USER = `git config user.name`
 MAINTAINER_EMAIL = `git config user.email`
@@ -13,8 +17,8 @@ FPMOPTS = \
 	--license "The MIT License (MIT)" \
 	--url $(URL) \
 	--description $(DESCRIPTION) \
-	./bin/rehearsal=/usr/bin/rehearsal \
-	./man/rehearsal.1=/usr/share/man/man1/rehearsal.1
+	./bin/rehearsal=$(BINDIR)/rehearsal \
+	./man/rehearsal.1=$(MANDIR)/man1/rehearsal.1
 DEB = rehearsal_$(VERSION)_all.deb
 RPM = rehearsal-$(VERSION)-1.noarch.rpm
 
