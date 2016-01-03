@@ -465,6 +465,13 @@ proc write_junit {results junit_file} {
     close $f
 }
 
+proc usage {} {
+    # $usage will be filled in make process; see Makefile
+    set usage {
+    }
+    puts [string trim $usage]
+}
+
 # starting point
 
 # globals
@@ -513,6 +520,7 @@ while {true} {
         shift argv 1
     } else {
         puts "unknown option: $first"
+        usage
         exit 1
     }
 }

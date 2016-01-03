@@ -13,63 +13,68 @@ FPMOPTS = \
 	--license "The MIT License (MIT)" \
 	--url $(URL) \
 	--description $(DESCRIPTION) \
-	./rehearsal=/usr/bin/rehearsal \
+	./bin/rehearsal=/usr/bin/rehearsal \
 	./man/rehearsal.1=/usr/share/man/man1/rehearsal.1
 
-check:
-	prove -v --exec ./rehearsal
+check: bin/rehearsal
+	prove -v --exec bin/rehearsal
+
+bin/rehearsal: rehearsal
+	awk '{print} /set usage/ {system("pod2usage -verbose 1 rehearsal.pod");}' \
+		$< > $@
+	chmod +x $@
 
 man/rehearsal.1: rehearsal.pod
 	pod2man -n rehearsal -r Rehearsal -d $(VERSION) -c "" rehearsal.pod > man/rehearsal.1
 
 deb: rehearsal_$(VERSION)_all.deb
-rehearsal_$(VERSION)_all.deb: rehearsal man/rehearsal.1 debian/changelog
+rehearsal_$(VERSION)_all.deb: bin/rehearsal man/rehearsal.1 debian/changelog
 	fpm -t deb --deb-changelog debian/changelog $(FPMOPTS)
 
 rpm: rehearsal-$(VERSION)-1.noarch.rpm
-rehearsal-$(VERSION)-1.noarch.rpm: rehearsal man/rehearsal.1
+rehearsal-$(VERSION)-1.noarch.rpm: bin/rehearsal man/rehearsal.1
 	fpm -t rpm $(FPMOPTS)
 
 tar: rehearsal-$(VERSION).tar.gz
-rehearsal-$(VERSION).tar.gz: rehearsal man/rehearsal.1
+rehearsal-$(VERSION).tar.gz: bin/rehearsal man/rehearsal.1
 	fpm -t tar -p rehearsal-$(VERSION).tar $(FPMOPTS)
 	gzip rehearsal-$(VERSION).tar
 
 clean:
-	rm -rf man/rehearsal.1 *.deb *.rpm *.tar.gz *.tar
+	rm -rf bin/rehearsal man/rehearsal.1 *.deb *.rpm *.tar.gz *.tar
 
-extra-check: python sml poly smlsharp alice mosml ocaml scala lua ruby
+extra-check: bin/rehearsal python sml poly smlsharp alice mosml ocaml scala lua ruby
 
 python:
-	./rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
-	./rehearsal -command python -ps1 ">>> " -ps2 '\.\.\. ' -snip '  ...' t/t/python-intro.t
+	bin/rehearsal -command python -ps1 '>>> ' -ps2 '\.\.\. ' t/t/python.t
+	bin/rehearsal -command python -ps1 ">>> " -ps2 '\.\.\. ' -snip '  ...' t/t/python-intro.t
 
 sml:
-	./rehearsal -command sml -ps1 '- ' -ps2 '= ' t/t/sml.t
+	bin/rehearsal -command sml -ps1 '- ' -ps2 '= ' t/t/sml.t
 
 poly:
-	./rehearsal -command poly -ps1 '> ' -ps2 '# ' t/t/poly.t
+	bin/rehearsal -command poly -ps1 '> ' -ps2 '# ' t/t/poly.t
 
 smlsharp:
-	./rehearsal -command smlsharp -banner 'SML# .*\n' -ps1 '# ' -ps2 '> ' t/t/smlsharp.t
+	bin/rehearsal -command smlsharp -banner 'SML# .*\n' -ps1 '# ' -ps2 '> ' t/t/smlsharp.t
 
 alice:
-	./rehearsal -command alice -ps1 '- ' -ps2 '  ' t/t/alice.t
+	bin/rehearsal -command alice -ps1 '- ' -ps2 '  ' t/t/alice.t
 
 mosml:
-	./rehearsal -command mosml -ps1 '- ' -ps2 '' t/t/mosml.t
+	bin/rehearsal -command mosml -ps1 '- ' -ps2 '' t/t/mosml.t
 
 ocaml:
-	./rehearsal -command ocaml -ps1 '# ' -ps2 '  ' t/t/ocaml.t
+	bin/rehearsal -command ocaml -ps1 '# ' -ps2 '  ' t/t/ocaml.t
 
 scala:
-	./rehearsal -command 'scala -Xnojline' -ps1 'scala> ' -ps2 '     \| ' t/t/scala.t
+	bin/rehearsal -command 'scala -Xnojline' -ps1 'scala> ' -ps2 '     \| ' t/t/scala.t
 
 lua:
-	./rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
+	bin/rehearsal -command lua -ps1 '> ' -ps2 '>> ' t/t/lua.t
 
 ruby:
-	./rehearsal -command irb -ps1 'irb\(main\):\d+:\d+> ' t/t/ruby-quickstart.t
+	bin/rehearsal -command irb -ps1 'irb\(main\):\d+:\d+> ' t/t/ruby-quickstart.t
 
 .PHONY: clean \
 	deb rpm tar \
