@@ -15,6 +15,8 @@ FPMOPTS = \
 	--description $(DESCRIPTION) \
 	./bin/rehearsal=/usr/bin/rehearsal \
 	./man/rehearsal.1=/usr/share/man/man1/rehearsal.1
+DEB = rehearsal_$(VERSION)_all.deb
+RPM = rehearsal-$(VERSION)-1.noarch.rpm
 
 check: bin/rehearsal
 	prove -v --exec bin/rehearsal
@@ -27,12 +29,12 @@ bin/rehearsal: rehearsal
 man/rehearsal.1: rehearsal.pod
 	pod2man -n rehearsal -r Rehearsal -d $(VERSION) -c "" rehearsal.pod > man/rehearsal.1
 
-deb: rehearsal_$(VERSION)_all.deb
-rehearsal_$(VERSION)_all.deb: bin/rehearsal man/rehearsal.1 debian/changelog
+deb: $(DEB)
+$(DEB): bin/rehearsal man/rehearsal.1 debian/changelog
 	fpm -t deb --deb-changelog debian/changelog $(FPMOPTS)
 
-rpm: rehearsal-$(VERSION)-1.noarch.rpm
-rehearsal-$(VERSION)-1.noarch.rpm: bin/rehearsal man/rehearsal.1
+rpm: $(RPM)
+$(RPM): bin/rehearsal man/rehearsal.1
 	fpm -t rpm $(FPMOPTS)
 
 tar: rehearsal-$(VERSION).tar.gz
