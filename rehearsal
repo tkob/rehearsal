@@ -242,11 +242,27 @@ namespace eval testcase_result {
         return [dict create num $num desc $desc result $result diag $diag]
     }
 
+    proc num {testcase_result} {
+        return [dict get $testcase_result num]
+    }
+
+    proc desc {testcase_result} {
+        return [dict get $testcase_result desc]
+    }
+
+    proc result {testcase_result} {
+        return [dict get $testcase_result result]
+    }
+
+    proc diag {testcase_result} {
+        return [dict get $testcase_result diag]
+    }
+
     proc print_tap {testcase_result} {
-        set n      [dict get $testcase_result num]
-        set desc   [dict get $testcase_result desc]
-        set result [dict get $testcase_result result]
-        set diag   [dict get $testcase_result diag]
+        set n      [num    $testcase_result]
+        set desc   [desc   $testcase_result]
+        set result [result $testcase_result]
+        set diag   [diag   $testcase_result]
         puts "$result $n $desc"
         foreach diag_line $diag {
             puts "# $diag_line"
@@ -458,16 +474,16 @@ proc write_junit {testcase_results junit_file} {
     puts $f {<?xml version="1.0" ?>}
     puts $f "<testsuite name='rehearsal' tests='[llength $testcase_results]'>"
     foreach testcase_result $testcase_results {
-        puts $f "<testcase name='[escape_xml "[dict get $testcase_result num] [dict get $testcase_result desc]"]'>"
-        if {[dict get $testcase_result result] == "not ok"} {
+        puts $f "<testcase name='[escape_xml "[testcase_result::num $testcase_result] [testcase_result::desc $testcase_result]"]'>"
+        if {[testcase_result::result $testcase_result] == "not ok"} {
             puts -nonewline $f {<failure>}
-            foreach line [dict get $testcase_result diag] {
+            foreach line [testcase_result::diag $testcase_result] {
                 puts $f [escape_xml $line]
             }
             puts $f {</failure>}
-        } elseif {[dict get $testcase_result result] == "Bail out!"} {
+        } elseif {[testcase_result::result $testcase_result] == "Bail out!"} {
             puts -nonewline $f {<error>}
-            foreach line [dict get $testcase_result diag] {
+            foreach line [testcase_result::diag $testcase_result] {
                 puts $f [escape_xml $line]
             }
             puts $f {</error>}
@@ -568,7 +584,7 @@ if {$junit_file != ""} {
 
 set exit_status 0
 foreach testcase_result $testcase_results {
-    set result [dict get $testcase_result result]
+    set result [testcase_result::result $testcase_result]
     if {$result != "ok"} {
         set exit_status 1
     }
