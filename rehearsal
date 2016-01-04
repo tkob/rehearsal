@@ -468,29 +468,33 @@ proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
 
-proc write_junit {testcase_results junit_file} {
+proc write_junit {testsuite_result junit_file} {
     set f [open $junit_file w]
     fconfigure $f -encoding utf-8
     puts $f {<?xml version="1.0" ?>}
-    puts $f "<testsuite name='rehearsal' tests='[llength $testcase_results]'>"
-    foreach testcase_result $testcase_results {
-        puts $f "<testcase name='[escape_xml "[testcase_result::num $testcase_result] [testcase_result::desc $testcase_result]"]'>"
-        if {[testcase_result::result $testcase_result] == "not ok"} {
-            puts -nonewline $f {<failure>}
-            foreach line [testcase_result::diag $testcase_result] {
-                puts $f [escape_xml $line]
+    puts $f {<testsuites>}
+    foreach {source_file testcase_results} $testsuite_result {
+        puts $f "<testsuite name='$source_file' tests='[llength $testcase_results]'>"
+        foreach testcase_result $testcase_results {
+            puts $f "<testcase name='[escape_xml "[testcase_result::num $testcase_result] [testcase_result::desc $testcase_result]"]'>"
+            if {[testcase_result::result $testcase_result] == "not ok"} {
+                puts -nonewline $f {<failure>}
+                foreach line [testcase_result::diag $testcase_result] {
+                    puts $f [escape_xml $line]
+                }
+                puts $f {</failure>}
+            } elseif {[testcase_result::result $testcase_result] == "Bail out!"} {
+                puts -nonewline $f {<error>}
+                foreach line [testcase_result::diag $testcase_result] {
+                    puts $f [escape_xml $line]
+                }
+                puts $f {</error>}
             }
-            puts $f {</failure>}
-        } elseif {[testcase_result::result $testcase_result] == "Bail out!"} {
-            puts -nonewline $f {<error>}
-            foreach line [testcase_result::diag $testcase_result] {
-                puts $f [escape_xml $line]
-            }
-            puts $f {</error>}
+            puts $f {</testcase>}
         }
-        puts $f {</testcase>}
+        puts $f {</testsuite>}
     }
-    puts $f {</testsuite>}
+    puts $f {</testsuites>}
     close $f
 }
 
@@ -569,17 +573,23 @@ if {[llength $argv] == 0} {
     exit 1
 }
 
-set f [open [lindex $argv 0]]
-if {$ps2 == ""} {
-    set testcases [markdown::parse $f $ps1 $ps1]
-} else {
-    set testcases [markdown::parse $f $ps1 $ps2]
+# testsuite_result is a list whose even index is source filename
+# and odd index is a list of testcase_results
+set testsuite_result [list]
+foreach source_file $argv {
+    set f [open $source_file]
+    if {$ps2 == ""} {
+        set testcases [markdown::parse $f $ps1 $ps1]
+    } else {
+        set testcases [markdown::parse $f $ps1 $ps2]
+    }
+    close $f
+    set testcase_results [run_testcases $testcases]
+    lappend testsuite_result $source_file $testcase_results
 }
-close $f
-set testcase_results [run_testcases $testcases]
 
 if {$junit_file != ""} {
-    write_junit $testcase_results $junit_file
+    write_junit $testsuite_result $junit_file
 }
 
 set exit_status 0
