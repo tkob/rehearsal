@@ -1,3 +1,12 @@
+# help.t
+
+```
+$ bin/rehearsal -anchor t/t/help.t
+1..2
+ok 1 Acceptable synonyms of `-help`
+ok 2 Unacceptable option
+```
+
 # bailout.t
 
 ```
