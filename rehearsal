@@ -2,6 +2,20 @@
 # vim: set filetype=tcl : \
 exec expect -f "$0" -- ${1+"$@"}
 
+# term definitions
+#
+# test case:
+#     test execution unit which is ok or not ok.
+#     corresponds to a heading in source file.
+#
+# step:
+#     command invocation inside a test.
+#     A test case can include multiple steps.
+#
+# test suite:
+#     a bundle of multiple test cases.
+#     corresponds to a single source file.
+
 namespace eval testcase {
     # operations for 'testcase' dict type
 
