@@ -259,12 +259,18 @@ proc print_tap {n result desc directive diag} {
 
 proc expect_prompt {} {
     uplevel 1 {
-        expect -re $prompt {
+        global anchor
+        if {$anchor} {
+            set re "(^|\\n)$prompt"
+        } else {
+            set re $prompt
+        }
+        expect -re $re {
         } timeout {
             expect -re .*
-            error "timeout: prompt /${prompt}/ expected but got <$expect_out(buffer)>"
+            error "timeout: prompt /${re}/ expected but got <$expect_out(buffer)>"
         }
-        regexp "^(.*)$prompt\$" $expect_out(buffer) match before_prompt
+        regexp "^(.*)${re}\$" $expect_out(buffer) match before_prompt
         return $before_prompt
     }
 }
@@ -492,6 +498,7 @@ set ps1 {\$ }
 set ps2 {> }
 set banner ""
 set snip "..."
+set anchor 0
 
 # parse argv
 while {true} {
@@ -526,6 +533,8 @@ while {true} {
     } elseif {$first == "-snip"} {
         lassign $argv snip
         shift argv 1
+    } elseif {$first == "-anchor"} {
+        set anchor 1
     } elseif {$first == "-timeout"} {
         lassign $argv timeout; # timeout variable of Expect
         shift argv 1
