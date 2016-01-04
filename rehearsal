@@ -404,7 +404,6 @@ proc run_test {} {
 }
 
 proc run_suite {suite} {
-    global results
     set command_line [dict get $suite command_line]
     set prompt [dict get $suite prompt]
     set tests [dict get $suite tests]
@@ -413,6 +412,7 @@ proc run_suite {suite} {
 
     puts "1..$num_tests"
     set n 0
+    set results [list]
     if {[catch {
             debug "spawning $command_line"
             set stty_init -echo
@@ -443,6 +443,7 @@ proc run_suite {suite} {
         puts "Bail out!"
         puts $message
     }
+    return $results
 }
 
 proc suite {suite} {
@@ -492,7 +493,6 @@ proc usage {} {
 set debug 0
 set log_file "" 
 set junit_file ""
-set results [list]
 set command_line {ksh}
 set ps1 {\$ }
 set ps2 {> }
@@ -562,7 +562,7 @@ if {$ps2 == ""} {
     set suite [markdown::parse $f $command_line $ps1 $ps2]
 }
 close $f
-run_suite $suite
+set results [run_suite $suite]
 
 if {$junit_file != ""} {
     write_junit $results $junit_file
