@@ -446,10 +446,6 @@ proc run_suite {suite} {
     return $results
 }
 
-proc suite {suite} {
-    run_suite $suite
-}
-
 proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
