@@ -55,7 +55,7 @@ namespace eval testcase {
 namespace eval markdown {
     # markdown parser
 
-    proc parse {channel command_line ps1 ps2} {
+    proc parse {channel ps1 ps2} {
         set state [list md_default $ps1 $ps2]
         set prev ""
         set tests [list]
@@ -555,9 +555,9 @@ if {[llength $argv] == 0} {
 
 set f [open [lindex $argv 0]]
 if {$ps2 == ""} {
-    set testcases [markdown::parse $f $command_line $ps1 $ps1]
+    set testcases [markdown::parse $f $ps1 $ps1]
 } else {
-    set testcases [markdown::parse $f $command_line $ps1 $ps2]
+    set testcases [markdown::parse $f $ps1 $ps2]
 }
 close $f
 set testcase_results [run_testcases $testcases]
