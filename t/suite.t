@@ -10,7 +10,7 @@ ok 2 Unacceptable option
 # bailout.t
 
 ```
-$ ./rehearsal -command no-such-command t/t/cat.t
+$ bin/rehearsal -command no-such-command t/t/cat.t
 1..1
 Bail out!
 ...
@@ -19,7 +19,7 @@ Bail out!
 # cat.t
 
 ```
-$ ./rehearsal t/t/cat.t
+$ bin/rehearsal t/t/cat.t
 1..1
 ok 1 cat output
 ```
@@ -27,7 +27,7 @@ ok 1 cat output
 # cat-fail.t
 
 ```
-$ ./rehearsal t/t/cat-fail.t
+$ bin/rehearsal t/t/cat-fail.t
 1..3
 not ok 1 cat output - line not match
 # expected: xxx
@@ -41,7 +41,7 @@ not ok 3 cat output - too match line
 # no-newline.t
 
 ```
-$ ./rehearsal t/t/no-newline.t
+$ bin/rehearsal t/t/no-newline.t
 1..2
 ok 1 no newline 1
 ok 2 no newline 2
@@ -50,7 +50,7 @@ ok 2 no newline 2
 # no-newline-fail.t
 
 ```
-$ ./rehearsal t/t/no-newline-fail.t
+$ bin/rehearsal t/t/no-newline-fail.t
 1..2
 not ok 1 no newline 1
 # expected: hello world
@@ -63,7 +63,7 @@ not ok 2 no newline 2
 # snip.t
 
 ```
-$ ./rehearsal t/t/snip.t
+$ bin/rehearsal t/t/snip.t
 1..7
 ok 1 snip in the middle
 ok 2 snip in the beginning
@@ -77,7 +77,7 @@ ok 7 snip should not match blank lines
 # snip-fail.t
 
 ```
-$ ./rehearsal t/t/snip-fail.t
+$ bin/rehearsal t/t/snip-fail.t
 1..3
 not ok 1 snip in the middle - fail
 # expected <xyz> but reached end
@@ -91,7 +91,7 @@ not ok 3 snip in the end - fail
 # multiplesteps.t
 
 ```
-$ ./rehearsal t/t/multisteps.t
+$ bin/rehearsal t/t/multisteps.t
 1..1
 ok 1 multiple steps
 ```
