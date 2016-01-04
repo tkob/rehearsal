@@ -541,6 +541,11 @@ if {$log_file != ""} {
     log_file -a $log_file
 }
 
+if {[llength $argv] == 0} {
+    puts "no input files"
+    exit 1
+}
+
 set f [open [lindex $argv 0]]
 if {$ps2 == ""} {
     set suite [markdown::parse $f $command_line $ps1 $ps1]
