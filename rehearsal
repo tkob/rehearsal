@@ -482,8 +482,8 @@ proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
 
-proc write_junit {testsuite_result junit_dir} {
-    foreach {source_file testcase_results} $testsuite_result {
+proc write_junit {testsuite_results junit_dir} {
+    foreach {source_file testcase_results} $testsuite_results {
         set testsuite_name [join [file split [file rootname $source_file]] .]
         set f [open [file join $junit_dir "TEST-${testsuite_name}.xml"] w]
         fconfigure $f -encoding utf-8
@@ -586,9 +586,9 @@ if {[llength $argv] == 0} {
     exit 1
 }
 
-# testsuite_result is a list whose even index is source filename
+# testsuite_results is a list whose even index is source filename
 # and odd index is a list of testcase_results
-set testsuite_result [list]
+set testsuite_results [list]
 foreach source_file $argv {
     set f [open $source_file]
     if {$ps2 == ""} {
@@ -598,11 +598,11 @@ foreach source_file $argv {
     }
     close $f
     set testcase_results [run_testcases $testcases]
-    lappend testsuite_result $source_file $testcase_results
+    lappend testsuite_results $source_file $testcase_results
 }
 
 if {$junit_dir != ""} {
-    write_junit $testsuite_result $junit_dir
+    write_junit $testsuite_results $junit_dir
 }
 
 set exit_status 0
