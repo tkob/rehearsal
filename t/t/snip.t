@@ -63,3 +63,16 @@ jkl
 mno
 ...
 ```
+
+# snip should not match blank lines
+
+```
+$ echo; echo abc
+...
+```
+
+```
+$ echo abc; echo; echo def
+abc
+...
+```

@@ -55,13 +55,14 @@ not ok 2 no newline 2
 
 ```
 $ ./rehearsal t/t/snip.t
-1..6
+1..7
 ok 1 snip in the middle
 ok 2 snip in the beginning
 ok 3 snip in the beginning 2
 ok 4 snip in the end
 ok 5 snip in the end 2
 ok 6 mix
+ok 7 snip should not match blank lines
 ```
 
 # snip-fail.t

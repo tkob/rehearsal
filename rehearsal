@@ -323,10 +323,14 @@ proc run_test {} {
                 lassign $output opts output_line
                 shift output 2
                 if {$opts == "snip"} {
-                    set state snip
-                    lassign $output opts output_line
-                    debug "until: $output_line"
-                    shift output 2
+                    if {[llength $output] > 0} {
+                        set state snip
+                        lassign $output opts output_line
+                        debug "until: $output_line"
+                        shift output 2
+                    } else {
+                        continue
+                    }
                 } else {
                     set state normal
                 }
@@ -368,10 +372,14 @@ proc run_test {} {
                     lassign $output opts output_line
                     shift output 2
                     if {$opts == "snip"} {
-                        set state snip
-                        lassign $output opts output_line
-                        debug "until: $output_line"
-                        shift output 2
+                        if {[llength $output] > 0} {
+                            set state snip
+                            lassign $output opts output_line
+                            debug "until: $output_line"
+                            shift output 2
+                        } else {
+                            break
+                        }
                     } else {
                         set state normal
                     }
