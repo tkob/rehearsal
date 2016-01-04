@@ -25,7 +25,7 @@ RPM = rehearsal-$(VERSION)-1.noarch.rpm
 check: bin/rehearsal
 	prove -v --exec bin/rehearsal
 
-bin/rehearsal: rehearsal
+bin/rehearsal: rehearsal rehearsal.pod
 	awk '{print} /set usage/ {system("pod2usage -verbose 1 rehearsal.pod");}' \
 		$< > $@
 	chmod +x $@
