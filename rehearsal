@@ -234,6 +234,27 @@ namespace eval markdown {
     }
 }
 
+namespace eval testcase_result {
+    # num: test case number
+    # desc: description of the test
+    # result: "ok", "not ok" or "Bail out!"
+    # diag: diagnosis of the failure/error
+    proc new {num desc result diag} {
+        return [dict create num $num desc $desc result $result diag $diag]
+    }
+
+    proc print_tap {testcase_result} {
+        set n      [dict get $testcase_result num]
+        set desc   [dict get $testcase_result desc]
+        set result [dict get $testcase_result result]
+        set diag   [dict get $testcase_result diag]
+        puts "$result $n $desc"
+        foreach diag_line $diag {
+            puts "# $diag_line"
+        }
+    }
+}
+
 proc shift {var n} {
     upvar $var list
     set list [lrange $list $n end]
@@ -243,17 +264,6 @@ proc debug {msg} {
     global debug
     if {$debug} {
         puts "# debug: $msg"
-    }
-}
-
-proc print_tap {n result desc directive diag} {
-    if {$directive == ""} {
-        puts "$result $n $desc"
-    } else {
-        puts "$result $n $desc # $directive"
-    }
-    foreach diag_line $diag {
-        puts "# $diag_line"
     }
 }
 
@@ -412,7 +422,7 @@ proc run_suite {suite} {
 
     puts "1..$num_tests"
     set n 0
-    set results [list]
+    set testcase_results [list]
     if {[catch {
             debug "spawning $command_line"
             set stty_init -echo
@@ -424,48 +434,41 @@ proc run_suite {suite} {
                 incr n
                 debug "running $n"
                 lassign [run_test] result desc directive diag
-                lappend results [dict create \
-                    num $n \
-                    result $result \
-                    desc $desc \
-                    diag $diag]
-                print_tap $n $result $desc $directive $diag
+                set testcase_result [testcase_result::new $n $desc $result $diag]
+                lappend testcase_results $testcase_result
+                testcase_result::print_tap $testcase_result
             }
 
             send "\004"
             expect eof
         } message]} {
-        lappend results [dict create \
-            result "Bail out!" \
-            num $n \
-            desc "?" \
-            diag [split $message]]
+        lappend testcase_results [testcase_result::new $n "?" "Bail out!" [split $message]]
         puts "Bail out!"
         puts $message
     }
-    return $results
+    return $testcase_results
 }
 
 proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
 
-proc write_junit {results junit_file} {
+proc write_junit {testcase_results junit_file} {
     set f [open $junit_file w]
     fconfigure $f -encoding utf-8
     puts $f {<?xml version="1.0" ?>}
-    puts $f "<testsuite name='rehearsal' tests='[llength $results]'>"
-    foreach result $results {
-        puts $f "<testcase name='[escape_xml "[dict get $result num] [dict get $result desc]"]'>"
-        if {[dict get $result result] == "not ok"} {
+    puts $f "<testsuite name='rehearsal' tests='[llength $testcase_results]'>"
+    foreach testcase_result $testcase_results {
+        puts $f "<testcase name='[escape_xml "[dict get $testcase_result num] [dict get $testcase_result desc]"]'>"
+        if {[dict get $testcase_result result] == "not ok"} {
             puts -nonewline $f {<failure>}
-            foreach line [dict get $result diag] {
+            foreach line [dict get $testcase_result diag] {
                 puts $f [escape_xml $line]
             }
             puts $f {</failure>}
-        } elseif {[dict get $result result] == "Bail out!"} {
+        } elseif {[dict get $testcase_result result] == "Bail out!"} {
             puts -nonewline $f {<error>}
-            foreach line [dict get $result diag] {
+            foreach line [dict get $testcase_result diag] {
                 puts $f [escape_xml $line]
             }
             puts $f {</error>}
@@ -558,16 +561,16 @@ if {$ps2 == ""} {
     set suite [markdown::parse $f $command_line $ps1 $ps2]
 }
 close $f
-set results [run_suite $suite]
+set testcase_results [run_suite $suite]
 
 if {$junit_file != ""} {
-    write_junit $results $junit_file
+    write_junit $testcase_results $junit_file
 }
 
 set exit_status 0
-foreach result $results {
-    set case_result [dict get $result result]
-    if {$case_result != "ok"} {
+foreach testcase_result $testcase_results {
+    set result [dict get $testcase_result result]
+    if {$result != "ok"} {
         set exit_status 1
     }
 }
