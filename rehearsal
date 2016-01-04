@@ -67,9 +67,8 @@ namespace eval markdown {
             set prev $line
         }
         testcase::carry tests test
-        set suite [dict create tests $tests]
-        debug "suite: $suite"
-        return $suite
+        debug "tests: $tests"
+        return $tests
     }
 
     proc md_default {ps1 ps2 line} {
@@ -414,9 +413,9 @@ proc run_test {} {
     }
 }
 
-proc run_suite {suite} {
+proc run_testcases {testcases} {
     global command_line
-    set tests [dict get $suite tests]
+    set tests $testcases
     set num_tests [llength $tests]
     if {$num_tests == 0} return
 
@@ -556,12 +555,12 @@ if {[llength $argv] == 0} {
 
 set f [open [lindex $argv 0]]
 if {$ps2 == ""} {
-    set suite [markdown::parse $f $command_line $ps1 $ps1]
+    set testcases [markdown::parse $f $command_line $ps1 $ps1]
 } else {
-    set suite [markdown::parse $f $command_line $ps1 $ps2]
+    set testcases [markdown::parse $f $command_line $ps1 $ps2]
 }
 close $f
-set testcase_results [run_suite $suite]
+set testcase_results [run_testcases $testcases]
 
 if {$junit_file != ""} {
     write_junit $testcase_results $junit_file
