@@ -67,7 +67,7 @@ namespace eval markdown {
             set prev $line
         }
         testcase::carry tests test
-        set suite [dict create command_line $command_line prompt $ps1 tests $tests]
+        set suite [dict create tests $tests]
         debug "suite: $suite"
         return $suite
     }
@@ -415,8 +415,7 @@ proc run_test {} {
 }
 
 proc run_suite {suite} {
-    set command_line [dict get $suite command_line]
-    set prompt [dict get $suite prompt]
+    global command_line
     set tests [dict get $suite tests]
     set num_tests [llength $tests]
     if {$num_tests == 0} return
