@@ -502,6 +502,9 @@ while {true} {
         break
     } elseif {$first == "-v"} {
         set debug 1
+    } elseif {[regexp -- {^--?h(elp)?$} $first]} {
+        usage
+        exit 0
     } elseif {$first == "-log"} {
         lassign $argv log_file
         shift argv 1
