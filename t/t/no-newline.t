@@ -6,7 +6,7 @@ hello world
 ```
 
 ```
-printf "hello world"
+$ printf "hello world"
 hello world
 ```
 
@@ -18,6 +18,6 @@ hello world
 ```
 
 ```
-printf "hello world"
+$ printf "hello world"
 hello world
 ```
