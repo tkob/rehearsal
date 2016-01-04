@@ -4,7 +4,7 @@ rehearsal - A testing framework based on interactive shell
 
 =head1 SYNOPSIS
 
-rehearsal ?-help? ?-log I<file>? ?-junit I<file>? ?-command I<command>? ?-banner I<regexp>? ?-ps1 I<regexp>? ?-ps2 I<regexp>? ?-snip I<string>? ?-anchor? ?-timeout I<seconds>? ?--? I<file ...>
+rehearsal ?-help? ?-log I<file>? ?-junit I<dir>? ?-command I<command>? ?-banner I<regexp>? ?-ps1 I<regexp>? ?-ps2 I<regexp>? ?-snip I<string>? ?-anchor? ?-timeout I<seconds>? ?--? I<file ...>
 
 =head1 DESCRIPTION
 
@@ -23,9 +23,9 @@ Prints usage.
 
 A file to which dialogue is logged.
 
-=item -junit I<file>
+=item -junit I<dir>
 
-Write JUnit XML file.
+Directory to which JUnit XML files are written.
 
 =item -command I<command>
 

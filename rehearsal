@@ -482,13 +482,13 @@ proc escape_xml {s} {
     return [string map [list "\"" {&quot;} ' {&apos;} < {&lt;} > {&gt;} & {&amp;}] $s]
 }
 
-proc write_junit {testsuite_result junit_file} {
-    set f [open $junit_file w]
-    fconfigure $f -encoding utf-8
-    puts $f {<?xml version="1.0" ?>}
-    puts $f {<testsuites>}
+proc write_junit {testsuite_result junit_dir} {
     foreach {source_file testcase_results} $testsuite_result {
-        puts $f "<testsuite name='$source_file' tests='[llength $testcase_results]'>"
+        set testsuite_name [join [file split [file rootname $source_file]] .]
+        set f [open [file join $junit_dir "TEST-${testsuite_name}.xml"] w]
+        fconfigure $f -encoding utf-8
+        puts $f {<?xml version="1.0" ?>}
+        puts $f "<testsuite name='$testsuite_name' tests='[llength $testcase_results]'>"
         foreach testcase_result $testcase_results {
             puts $f "<testcase name='[escape_xml "[testcase_result::num $testcase_result] [testcase_result::desc $testcase_result]"]'>"
             if {[testcase_result::result $testcase_result] == "not ok"} {
@@ -507,9 +507,8 @@ proc write_junit {testsuite_result junit_file} {
             puts $f {</testcase>}
         }
         puts $f {</testsuite>}
+        close $f
     }
-    puts $f {</testsuites>}
-    close $f
 }
 
 proc usage {} {
@@ -524,7 +523,7 @@ proc usage {} {
 # globals
 set debug 0
 set log_file "" 
-set junit_file ""
+set junit_dir ""
 set command_line {ksh}
 set ps1 {\$ }
 set ps2 {> }
@@ -548,7 +547,7 @@ while {true} {
         lassign $argv log_file
         shift argv 1
     } elseif {$first == "-junit"} {
-        lassign $argv junit_file
+        lassign $argv junit_dir
         shift argv 1
     } elseif {$first == "-command"} {
         lassign $argv command_line
@@ -602,8 +601,8 @@ foreach source_file $argv {
     lappend testsuite_result $source_file $testcase_results
 }
 
-if {$junit_file != ""} {
-    write_junit $testsuite_result $junit_file
+if {$junit_dir != ""} {
+    write_junit $testsuite_result $junit_dir
 }
 
 set exit_status 0
