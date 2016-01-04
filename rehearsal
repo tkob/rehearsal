@@ -269,11 +269,12 @@ proc debug {msg} {
 
 proc expect_prompt {} {
     uplevel 1 {
+        global ps1
         global anchor
         if {$anchor} {
-            set re "(^|\\n)$prompt"
+            set re "(^|\\n)$ps1"
         } else {
-            set re $prompt
+            set re $ps1
         }
         expect -re $re {
         } timeout {
