@@ -9,7 +9,7 @@ exec expect -f "$0" -- ${1+"$@"}
 #     corresponds to a heading in source file.
 #
 # step:
-#     command invocation inside a test.
+#     command invocation inside a test case.
 #     A test case can include multiple steps.
 #
 # test suite:
