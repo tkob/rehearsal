@@ -12,6 +12,8 @@ FPMOPTS = \
 	-n rehearsal \
 	-v $(VERSION) \
 	-a all \
+	-d 'expect' \
+	-d 'tcl >= 8.5' \
 	-m "$(MAINTAINER_USER) <$(MAINTAINER_EMAIL)>" \
 	--vendor "$(MAINTAINER_USER) <$(MAINTAINER_EMAIL)>" \
 	--license "The MIT License (MIT)" \
