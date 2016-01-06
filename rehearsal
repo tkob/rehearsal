@@ -485,10 +485,23 @@ proc escape_xml {s} {
 proc write_junit {testsuite_results junit_dir} {
     foreach {source_file testcase_results} $testsuite_results {
         set testsuite_name [join [file split [file rootname $source_file]] .]
+        set failures 0
+        set errors 0
+        foreach testcase_result $testcase_results {
+            set result [testcase_result::result $testcase_result]
+            if {result == "not ok"} {
+                incr failures
+            } elseif {result == "Bail out!"} {
+                incr errors
+            }
+        }
         set f [open [file join $junit_dir "TEST-${testsuite_name}.xml"] w]
         fconfigure $f -encoding utf-8
         puts $f {<?xml version="1.0" ?>}
-        puts $f "<testsuite name='$testsuite_name' tests='[llength $testcase_results]'>"
+        puts $f "<testsuite name='[escape_xml $testsuite_name]'"
+        puts $f "    tests='[llength $testcase_results]'"
+        puts $f "    failures='$failures'"
+        puts $f "    errors='$errors'>"
         foreach testcase_result $testcase_results {
             puts $f "<testcase name='[escape_xml "[testcase_result::num $testcase_result] [testcase_result::desc $testcase_result]"]'>"
             if {[testcase_result::result $testcase_result] == "not ok"} {
