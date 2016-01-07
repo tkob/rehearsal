@@ -489,9 +489,9 @@ proc write_junit {testsuite_results junit_dir} {
         set errors 0
         foreach testcase_result $testcase_results {
             set result [testcase_result::result $testcase_result]
-            if {result == "not ok"} {
+            if {$result == "not ok"} {
                 incr failures
-            } elseif {result == "Bail out!"} {
+            } elseif {$result == "Bail out!"} {
                 incr errors
             }
         }
