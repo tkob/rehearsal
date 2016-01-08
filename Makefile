@@ -48,6 +48,14 @@ rehearsal-$(VERSION).tar.gz: bin/rehearsal man/rehearsal.1
 	fpm -t tar -p rehearsal-$(VERSION).tar $(FPMOPTS)
 	gzip rehearsal-$(VERSION).tar
 
+bintray: $(DEB) $(RPM)
+	curl -T $(DEB) \
+		-u$(BINTRAY_USER):$(BINTRAY_API_KEY) \
+		"https://api.bintray.com/content/$(BINTRAY_USER)/deb/rehearsal/$(VERSION)/$(DEB);deb_distribution=jessie,wheezy,trusty;deb_component=main;deb_architecture=all"
+	curl -T $(RPM) \
+		-u$(BINTRAY_USER):$(BINTRAY_API_KEY) \
+		"https://api.bintray.com/content/$(BINTRAY_USER)/rpm/rehearsal/$(VERSION)/$(RPM)"
+
 clean:
 	rm -rf bin/rehearsal man/rehearsal.1 *.deb *.rpm *.tar.gz *.tar
 
