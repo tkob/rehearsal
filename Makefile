@@ -2,7 +2,7 @@ PREFIX = /usr
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/share/man
 
-VERSION = 0.1
+VERSION = 0.1.0
 MAINTAINER_USER = `git config user.name`
 MAINTAINER_EMAIL = `git config user.email`
 URL = "https://github.com/tkob/rehearsal"
