@@ -50,7 +50,7 @@ rehearsal-$(VERSION).tar.gz: bin/rehearsal man/rehearsal.1
 bintray: $(DEB) $(RPM)
 	curl -T $(DEB) \
 		-u$(BINTRAY_USER):$(BINTRAY_API_KEY) \
-		"https://api.bintray.com/content/$(BINTRAY_USER)/deb/rehearsal/$(VERSION)/$(DEB);deb_distribution=squeeze,wheezy,jessie,wheezy,precise,trusty,vivid,wily,xenial;deb_component=rehearsal;deb_architecture=all"
+		"https://api.bintray.com/content/$(BINTRAY_USER)/deb/rehearsal/$(VERSION)/$(DEB);deb_distribution=squeeze,wheezy,jessie,precise,trusty,vivid,wily,xenial;deb_component=rehearsal;deb_architecture=all"
 	curl -T $(RPM) \
 		-u$(BINTRAY_USER):$(BINTRAY_API_KEY) \
 		"https://api.bintray.com/content/$(BINTRAY_USER)/rpm/rehearsal/$(VERSION)/$(RPM)"
