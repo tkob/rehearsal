@@ -55,6 +55,24 @@ bintray: $(DEB) $(RPM)
 		-u$(BINTRAY_USER):$(BINTRAY_API_KEY) \
 		"https://api.bintray.com/content/$(BINTRAY_USER)/rpm/rehearsal/$(VERSION)/$(RPM)"
 
+check-bintray: check-bintray-debian check-bintray-ubuntu check-bintray-centos
+
+check-bintray-debian:
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" debian squeeze
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" debian wheezy
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" debian jessie
+
+check-bintray-ubuntu:
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" ubuntu precise
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" ubuntu trusty
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" ubuntu vivid
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" ubuntu wily
+	sudo ./check-bintray-deb "$(BINTRAY_USER)" ubuntu xenial
+
+check-bintray-centos:
+	sudo ./check-bintray-rpm "$(BINTRAY_USER)" centos centos6
+	sudo ./check-bintray-rpm "$(BINTRAY_USER)" centos centos7
+
 clean:
 	rm -rf bin/rehearsal man/rehearsal.1 *.deb *.rpm *.tar.gz *.tar
 
@@ -94,5 +112,6 @@ ruby:
 .PHONY: clean \
 	deb rpm tar \
 	bintray \
+	check-bintray check-bintray-debian check-bintray-ubuntu check-bintray-centos \
 	check \
 	extra-check python sml poly smlsharp alice mosml ocaml scala lua ruby
