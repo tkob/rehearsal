@@ -1,5 +1,5 @@
-rehearsal (VERSION) UNRELEASED; urgency=medium
+rehearsal (0.1.0) unstable; urgency=medium
 
   * Initial release.
 
- -- tkob <ether4@gmail.com>  Sun, 03 Jan 2016 16:31:37 +0900
+ -- tkob <ether4@gmail.com>  Sat, 09 Jan 2016 19:12:01 +0900
