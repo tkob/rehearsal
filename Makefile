@@ -94,5 +94,6 @@ ruby:
 
 .PHONY: clean \
 	deb rpm tar \
+	bintray \
 	check \
 	extra-check python sml poly smlsharp alice mosml ocaml scala lua ruby
