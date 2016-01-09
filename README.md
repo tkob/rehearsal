@@ -42,8 +42,37 @@ ok 1 Define and test greet function
 
 ## Installation
 
-Installation is just adding to your PATH the directory where `rehearsal` is placed.
-Rehearsal depends on Expect based on Tcl8.5+.
+### 1. Simple Installation
+
+Rehearsal is a single file Expect script.
+So if you have Expect (based on Tcl8.5+) already instlled, all you have to do is
+to download [the latest release](https://github.com/tkob/rehearsal/releases)
+and extract the executable file `rehearsal`.
+
+### 2. apt-get Installation
+
+Available from [Bintray](https://bintray.com/tkob/deb/rehearsal/view).
+
+```
+echo "deb https://dl.bintray.com/tkob/deb {distribution} rehearsal" | sudo tee -a /etc/apt/sources.list
+sudo apt-get install rehearsal
+```
+
+where `{distribution}` is code name of your Debian/Ubuntu distribution. (e.g. wheezy, trusty...)
+
+You can also download deb file from Bintray.
+
+### 3. yum Installation
+
+Available from [Bintray](https://bintray.com/tkob/rpm/rehearsal/view).
+
+```
+wget https://bintray.com/tkob/rpm/rpm -O bintray-tkob-rpm.repo
+sudo mv bintray-tkob-rpm.repo /etc/yum.repos.d/
+sudo yum install rehearsal
+```
+
+You can also download rpm file from Bintray.
 
 ## Command Line Options
 
