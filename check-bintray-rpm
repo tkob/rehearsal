@@ -1,0 +1,13 @@
+#!/bin/sh
+
+BINTRAY_USER=$1
+OS=$2
+DIST=$3
+
+docker run $OS:$DIST /bin/sh -c "
+yum install -y wget
+wget --no-check-certificate https://bintray.com/$BINTRAY_USER/rpm/rpm -O bintray-$BINTRAY_USER-rpm.repo
+mv bintray-$BINTRAY_USER-rpm.repo /etc/yum.repos.d/
+yum install -y rehearsal
+rehearsal -help
+"

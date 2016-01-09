@@ -1,0 +1,12 @@
+#!/bin/sh
+
+BINTRAY_USER=$1
+OS=$2
+DIST=$3
+
+docker run $OS:$DIST /bin/sh -c "
+echo 'deb http://dl.bintray.com/$BINTRAY_USER/deb $DIST rehearsal' | tee -a /etc/apt/sources.list
+apt-get update
+apt-get install -y --force-yes rehearsal
+rehearsal -help
+"
