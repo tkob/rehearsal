@@ -45,7 +45,7 @@ ok 1 Define and test greet function
 ### 1. Simple Installation
 
 Rehearsal is a single file Expect script.
-So if you have Expect (based on Tcl8.5+) already instlled, all you have to do is
+So if you have Expect (based on Tcl8.5+) already installed, all you have to do is
 to download [the latest release](https://github.com/tkob/rehearsal/releases)
 and extract the executable file `rehearsal`.
 
